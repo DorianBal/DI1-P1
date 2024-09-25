@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  code_quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Code checkout
+      uses: actions/checkout@v4
+
+    - name: .NET setup
+      uses: actions/setup-dotnet@v4
+
+    - name: Dependencies restoration
+      run: dotnet restore
+
+    - name: Code style enforcement
+      run: dotnet format --verify-no-changes
+  
+  test:
+    runs-on: ubuntu-latest
+    needs: [code_quality]
+    permissions:
+      contents: write
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: .NET setup
+        uses: actions/setup-dotnet@v4
+
+      - name: Dependencies restoration
+        run: dotnet restore
+
+      - name: Solution build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: XUnit tests
+        run: |
+          dotnet test \
+          --no-build \
+          --configuration Release \
+          --verbosity normal \
+          --logger trx \
+          --collect:"XPlat Code Coverage" \
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include="[*]Server.Actions*"
+      
+      - name: Coverage reports combination
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.3.8
+        with:
+          reports: "**/*.cobertura.xml"
+          targetdir: "${{ github.workspace }}"
+          reporttypes: "Cobertura"
+          verbosity: "Info"
+          title: "Code Coverage"
+          tag: "${{ github.run_number }}_${{ github.run_id }}"
+          customSettings: ""
+          toolpath: "reportgeneratortool"
+
+      - name: Coverage report upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: ${{ github.workspace }}/Cobertura.xml
+          retention-days: 5
+      
+      - name: Coverage report publish
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: "Cobertura.xml"
+          badge: true
+          fail_below_min: false
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: false
+          indicators: true
+          output: both
+          thresholds: "10 30"
+
+      - name: README update
+        run: |
+          README_FILE="README.md"
+          TEST_FILE="code-coverage-results.md"
+          TEST_CONTENT=$(cat "$TEST_FILE")
+          sed -i -e '/<!-- COVERAGE_RESULTS_START -->/,/<!-- COVERAGE_RESULTS_END -->/{//!d;}' -e "/<!-- COVERAGE_RESULTS_START -->/r /dev/stdin" "$README_FILE" <<< "$TEST_CONTENT"
+          rm code-coverage-results.md
+          git config --local user.name "Github CI"
+          git config --local user.email "git@github.com"
+          git add README.md
+          if [ -n "$(git diff --cached)" ]; then
+            git commit -m '[CI] Updated README'
+          fi
+
+      - name: README push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
