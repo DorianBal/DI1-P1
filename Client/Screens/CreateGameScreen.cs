@@ -290,11 +290,13 @@ public class CreateGameForm
         );
     }
 
-        private void UpdateSubmitButtonState() // Désactive le bouton Submit, quand toute les informations du formulaire ne sont pas remplies
+    private void UpdateSubmitButtonState() // Désactive le bouton Submit, quand toute les informations du formulaire ne sont pas remplies
     {
+        bool isRoundsValid = int.TryParse(RoundsField.Text.ToString(), out int roundsValue);
+
         SubmitButton.Enabled = !string.IsNullOrWhiteSpace(GameNameField.Text.ToString()) &&
                                !string.IsNullOrWhiteSpace(PlayerNameField.Text.ToString()) &&
                                !string.IsNullOrWhiteSpace(CompanyNameField.Text.ToString()) &&
-                               !string.IsNullOrWhiteSpace(RoundsField.Text.ToString());
+                               isRoundsValid;
     }
 }

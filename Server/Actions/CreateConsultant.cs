@@ -68,7 +68,7 @@ public class CreateConsultant(
 
         foreach (var randomSkill in randomSkills)
         {
-            var leveledSkill = rnd.Next(6);
+            var leveledSkill = rnd.Next(3); // Mettre le niveau de départ à 3 au maximum
             consultant.Skills.Add(new LeveledSkill(randomSkill.Name, leveledSkill));
             totalSkillsLevel += leveledSkill;
         }
