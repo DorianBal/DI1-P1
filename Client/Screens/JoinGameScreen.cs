@@ -342,7 +342,8 @@ public class JoinGameForm
         SubmitButton = new Button() // Bouton de validation pour créer une partie
         {
             Text = "Submit",
-            IsDefault = true
+            IsDefault = true,
+            Enabled = false // (désactivé dès le départ)
         };
 
         ReturnButton = new Button() // Bouton retour (pour revenir au menu d'accueil)
@@ -351,6 +352,10 @@ public class JoinGameForm
             IsDefault = false,
             X = Pos.Right(SubmitButton) + 1
         };
+
+        // Événements de changement de texte pour les champs
+        PlayerNameField.TextChanged += (_, __) => UpdateSubmitButtonState();
+        CompanyNameField.TextChanged += (_, __) => UpdateSubmitButtonState();
 
         SubmitButton.Accept += OnSubmit;
         ReturnButton.Accept += OnReturn;
@@ -374,4 +379,12 @@ public class JoinGameForm
             ButtonsView
         );
     }
+
+    private void UpdateSubmitButtonState() // Désactive le bouton Submit, quand toute les informations du formulaire ne sont pas remplies
+    {
+        // Désactive le bouton Submit si les champs ne sont pas remplis
+        SubmitButton.Enabled = !string.IsNullOrWhiteSpace(PlayerNameField.Text.ToString()) &&
+                               !string.IsNullOrWhiteSpace(CompanyNameField.Text.ToString());
+    }
+
 }
