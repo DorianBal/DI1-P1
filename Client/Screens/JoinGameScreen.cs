@@ -18,6 +18,13 @@ public class JoinGameScreen(Window target)
     private readonly ListView GamesList = new(); // Stock la liste des parties créé
     private readonly Button ListReturnButton = new() { Text = "Return" }; // Bouton de retour
     private readonly JoinGameForm Form = new(); // Formulaire de création d'une partie
+    private readonly Label textviewerrorlist = new ()
+    {
+        Text = "No games available at the moment.",
+        X = Pos.Center(),  // Position centrale dans la fenêtre
+        Y = Pos.Center(),
+        Visible = false    // On cache l'élément par défaut
+    };
 
     private ICollection<JoinableGame> _joinableGames = []; // Listes des parties joinable
     private ICollection<JoinableGame> JoinableGames
@@ -36,7 +43,9 @@ public class JoinGameScreen(Window target)
     public async Task Show() // Permet d'afficher toute les informations
     {
         await BeforeShow(); // Attend que toute ces actions soient fini pour passer aux lignes suivantes
+
         await LoadGames();
+
         await SelectGame();
 
         if (ListReturned)
@@ -80,6 +89,9 @@ public class JoinGameScreen(Window target)
     {
         Target.RemoveAll();
         Target.Title = $"{MainWindow.Title} - [Join Game]";
+
+        Target.Add(textviewerrorlist);
+
         return Task.CompletedTask;
     }
 
@@ -94,6 +106,17 @@ public class JoinGameScreen(Window target)
         var dataSource = new JoinGameChoiceListDataSource();
         dataSource.AddRange(JoinableGames);
         GamesList.Source = dataSource;
+
+        if (JoinableGames.Count == 0)
+        {
+            textviewerrorlist.Visible = true;
+            GamesList.Visible = false;
+        }
+        else
+        {
+            textviewerrorlist.Visible = false;
+            GamesList.Visible = true;
+        }
     }
 
     private async Task LoadGames() // Chargement de la liste des parties joinable
@@ -117,8 +140,19 @@ public class JoinGameScreen(Window target)
 
         hubConnection.On<ICollection<JoinableGame>>("JoinableGamesListUpdated", data =>
         {
-            JoinableGames = data;
+            JoinableGames = data ?? new List<JoinableGame>();
             Loading = false;
+            
+            if (JoinableGames.Count == 0)
+            {
+                textviewerrorlist.Visible = true;
+                GamesList.Visible = false;  // Masquer la liste
+            }
+            else
+            {
+                textviewerrorlist.Visible = false;
+                GamesList.Visible = true;   // Afficher la liste si des jeux sont présents
+            }
         });
 
         await hubConnection.StartAsync();
@@ -155,8 +189,12 @@ public class JoinGameScreen(Window target)
         ListReturnButton.Y = Pos.Bottom(GamesList) + 1;
         ListReturnButton.Accept += (_, __) => ListReturned = true;
 
+        //textviewerrorlist.X = Pos.Center();
+        //textviewerrorlist.Y = Pos.Bottom(ListReturnButton) + 1;
+
         Target.Add(GamesList);
         Target.Add(ListReturnButton);
+        //Target.Add(textviewerrorlist);
 
         GamesList.OpenSelectedItem += (_, selected) => GameId = ((JoinableGame) selected.Value).Id;
         GamesList.SetFocus();
