@@ -20,7 +20,7 @@ public class JoinGameScreen(Window target)
     private readonly JoinGameForm Form = new(); // Formulaire de création d'une partie
     private readonly Label textviewerrorlist = new ()
     {
-        Text = "No games available at the moment.",
+        Text = "la game list est vide si on voit ça",
         X = Pos.Center(),  // Position centrale dans la fenêtre
         Y = Pos.Center(),
         Visible = false    // On cache l'élément par défaut
@@ -107,6 +107,7 @@ public class JoinGameScreen(Window target)
         dataSource.AddRange(JoinableGames);
         GamesList.Source = dataSource;
 
+        //le if et else à été rajouter afin de n'afficher la liste que lorsqu'on a des jeux dedans et à l'inverse afficher l'erreur que si la liste est vide
         if (JoinableGames.Count == 0)
         {
             textviewerrorlist.Visible = true;
@@ -116,6 +117,9 @@ public class JoinGameScreen(Window target)
         {
             textviewerrorlist.Visible = false;
             GamesList.Visible = true;
+
+            GamesList.Width = JoinableGames.Max(g => g.Name.Length);
+            GamesList.Height = Math.Min(JoinableGames.Count, 20);
         }
     }
 
@@ -182,19 +186,16 @@ public class JoinGameScreen(Window target)
     private async Task SelectGame() // Gestion de la sélection d'une partie
     {
         GamesList.X = GamesList.Y = Pos.Center();
-        GamesList.Width = JoinableGames.Max(g => g.Name.Length);
-        GamesList.Height = Math.Min(JoinableGames.Count, 20);
+        //ancien code juste après
+        //GamesList.Width = JoinableGames.Max(g => g.Name.Length);//l'erreur est ici car joinablegame est null
+        //GamesList.Height = Math.Min(JoinableGames.Count, 20);
 
         ListReturnButton.X = Pos.Center();
         ListReturnButton.Y = Pos.Bottom(GamesList) + 1;
         ListReturnButton.Accept += (_, __) => ListReturned = true;
 
-        //textviewerrorlist.X = Pos.Center();
-        //textviewerrorlist.Y = Pos.Bottom(ListReturnButton) + 1;
-
         Target.Add(GamesList);
         Target.Add(ListReturnButton);
-        //Target.Add(textviewerrorlist);
 
         GamesList.OpenSelectedItem += (_, selected) => GameId = ((JoinableGame) selected.Value).Id;
         GamesList.SetFocus();
