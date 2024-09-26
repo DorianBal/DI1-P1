@@ -76,7 +76,6 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             ReloadWindowTitle();
             CurrentGameLoading = false;
             CurrentRoundAction = null;
-            // if (data.Status == "Waiting") { await DisplayMainView(); }
             if (data.Status == "InProgress") { CurrentGameStarted = true; }
             if (data.Status == "Ended") { CurrentGameEnded = true; }
         });
@@ -123,7 +122,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             Target.Remove(mainView);
             mainView = new CurrentGameMainView(CurrentGame!, PlayerName);
             Target.Add(mainView);
-            await Task.Delay(100);
+            await Task.Delay(500);
         }
     }
 
@@ -171,7 +170,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
 
         var loadingDialog = new Dialog()
         {
-            Width = 18,
+            Width = 30,
             Height = 3
         };
 
