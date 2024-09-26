@@ -20,7 +20,7 @@ public class JoinGameScreen(Window target)
     private readonly JoinGameForm Form = new(); // Formulaire de création d'une partie
     private readonly Label textviewerrorlist = new ()
     {
-        Text = "la game list est vide si on voit ça",
+        Text = "No games available at the moment",
         X = Pos.Center(),  // Position centrale dans la fenêtre
         Y = Pos.Center(),
         Visible = false    // On cache l'élément par défaut
