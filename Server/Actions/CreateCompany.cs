@@ -68,7 +68,11 @@ public class CreateCompany(
 
         foreach (var index in Enumerable.Range(1, 3))
         {
-            var createEmployeeParams = new CreateEmployeeParams("Will Smith", Company: company);
+            // Génère un nombre de consultants aléatoire en fonction du nombre de joueurs dans la partie
+            List<String> nameList = ["Mr.Dupont", "Mme.Lefevre", "Mr.Durand", "Mme.Lemoine", "Mr.Girard", "Mr.Bernard", "Mme.Fournier", "Mr.Rousseau", "Mme.Morin", "Mr.Moreau", "Mme.Perrier", "Mr.Blanc", "Mr.Philippe", "Mme.Gauthier", "Mr.Renaud", "Mme.Martineau", "Mr.Leclerc", "Mme.Laroche", "Mr.Bertin", "Mme.Fontaine", "Mr.Dumas", "Mme.Carrier"];
+            int randomName = new Random().Next(0, nameList.Count);
+
+            var createEmployeeParams = new CreateEmployeeParams(nameList[randomName], Company: company);
             var createEmployeeResult = await createEmployeeAction.PerformAsync(createEmployeeParams);
 
             if (createEmployeeResult.IsFailed)

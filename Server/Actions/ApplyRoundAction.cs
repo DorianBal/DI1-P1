@@ -1,4 +1,5 @@
 
+using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 
 using FluentResults;
@@ -53,6 +54,22 @@ public class ApplyRoundAction(
         {
             return Result.Fail($"Game with Id \"{gameId}\" not found.");
         }
+
+        Console.WriteLine("\n\n\n\nAction : " + action + "\n\n");
+
+        if (action is SendEmployeeForTrainingRoundAction)
+            Console.WriteLine("TRAINING");
+        else if (action is ParticipateInCallForTendersRoundAction)
+            Console.WriteLine("TENDERS");
+        else if (action is RecruitAConsultantRoundAction)
+            Console.WriteLine("RECRUIT");
+        else if (action is FireAnEmployeeRoundAction)
+            Console.WriteLine("FIRE EMPLOYEE");
+        else if (action is PassMyTurnRoundAction)
+            Console.WriteLine("PASS TURN");
+        else
+            Console.WriteLine("AUTRE");
+
 
         // @todo: Implement the logic for applying the round action
 

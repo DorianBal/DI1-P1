@@ -10,6 +10,8 @@ start cmd /k "cd Server && dotnet run --launch-profile https"
 :: Ouvre le nombre de cmd pour les clients spécifié par l'utilisateur
 for /l %%i in (1, 1, %clients%) do (
     start cmd /k "cd Client && dotnet run"
+    :: Faire une pause de 0.1 seconde
+    timeout /t 1 > nul
 )
 
 exit
