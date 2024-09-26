@@ -122,7 +122,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             Target.Remove(mainView);
             mainView = new CurrentGameMainView(CurrentGame!, PlayerName);
             Target.Add(mainView);
-            await Task.Delay(500);
+            await Task.Delay(100);
         }
     }
 
@@ -334,7 +334,7 @@ public class CurrentGameMainView : CurrentGameView
             Width = Dim.Auto(DimAutoStyle.Text),
             Height = Dim.Auto(DimAutoStyle.Text),
             Text = "Start Game",
-            // Enabled = Game.Players.Count >= 2,
+            Enabled = Game.Players.Count >= 2,
         };
 
         Console.WriteLine("\n\n\n\n" + Game.Players.Count() + "\n\n\n\n");
