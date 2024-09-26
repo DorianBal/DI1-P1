@@ -70,12 +70,13 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             .AddJsonProtocol()
             .Build();
 
-        hubConnection.On<GameOverview>("CurrentGameUpdated", data =>
+        hubConnection.On<GameOverview>("CurrentGameUpdated", async data =>
         {
             CurrentGame = data;
             ReloadWindowTitle();
             CurrentGameLoading = false;
             CurrentRoundAction = null;
+            // if (data.Status == "Waiting") { await DisplayMainView(); }
             if (data.Status == "InProgress") { CurrentGameStarted = true; }
             if (data.Status == "Ended") { CurrentGameEnded = true; }
         });
@@ -119,6 +120,9 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
 
         while (!CurrentGameStarted)
         {
+            Target.Remove(mainView);
+            mainView = new CurrentGameMainView(CurrentGame!, PlayerName);
+            Target.Add(mainView);
             await Task.Delay(100);
         }
     }
@@ -334,7 +338,7 @@ public class CurrentGameMainView : CurrentGameView
             // Enabled = Game.Players.Count >= 2,
         };
 
-        Console.WriteLine("\n\n\n\n"+Game.Players.Count()+"\n\n\n\n");
+        Console.WriteLine("\n\n\n\n" + Game.Players.Count() + "\n\n\n\n");
 
         StartButton.Accept += async (_, __) => await StartGame();
 
