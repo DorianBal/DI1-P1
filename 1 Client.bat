@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
 
-start cmd /k "dotnet run"
+start cmd /k "cd Client && dotnet run"
 
 exit
