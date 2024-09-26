@@ -12,7 +12,6 @@ using Server.Actions.Contracts;
 using Server.Hubs.Contracts;
 using Server.Models;
 using Server.Persistence.Contracts;
-
 namespace Server.Actions;
 
 public sealed record ApplyRoundActionParams(
@@ -33,7 +32,8 @@ public class ApplyRoundActionValidator : AbstractValidator<ApplyRoundActionParam
 
 public class ApplyRoundAction(
     IGamesRepository gamesRepository,
-    IGameHubService gameHubService
+    IGameHubService gameHubService,
+    IEmployeesRepository employeesRepository
 ) : IAction<ApplyRoundActionParams, Result>
 {
     public async Task<Result> PerformAsync(ApplyRoundActionParams actionParams)
@@ -65,6 +65,8 @@ public class ApplyRoundAction(
             Console.WriteLine("RECRUIT");
         else if (action is FireAnEmployeeRoundAction)
             Console.WriteLine("FIRE EMPLOYEE");
+            //var unemployee = action.
+            //employeesRepository.FireEmployee(unemployee);
         else if (action is PassMyTurnRoundAction)
             Console.WriteLine("PASS TURN");
         else

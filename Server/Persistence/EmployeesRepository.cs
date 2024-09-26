@@ -17,7 +17,7 @@ public class EmployeesRepository(WssDbContext context) : IEmployeesRepository
 
         public async Task FireEmployee(Employee employee)
     {
-        context.Remove(employee);
+        context.Remove(employee);//peut-être appeler la list employees si erreur
 
         await context.SaveChangesAsync();
     }

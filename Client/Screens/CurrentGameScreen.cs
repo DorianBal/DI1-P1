@@ -201,6 +201,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             ActionType = CurrentRoundAction!.ToString(),
             ActionPayload = "{}",
             PlayerId = CurrentGame.Players.First(p => p.Name == PlayerName).Id
+            //la requête postman renvoie ce modèle de donnée avec dans actionpayload l'id de l'employee
         });
 
         await request;
