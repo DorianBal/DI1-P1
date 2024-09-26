@@ -12,7 +12,7 @@ public class GamesRepository(WssDbContext context) : IGamesRepository
         return await context.Games
             .Include(g => g.Players)
             .Where(g => g.Status == GameStatus.Waiting)
-            .Where(g => g.Players.Count < 3)
+            .Where(g => g.Players.Count < 6)
             .ToListAsync();
     }
 

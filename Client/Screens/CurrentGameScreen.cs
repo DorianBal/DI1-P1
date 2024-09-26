@@ -76,7 +76,6 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             ReloadWindowTitle();
             CurrentGameLoading = false;
             CurrentRoundAction = null;
-            // if (data.Status == "Waiting") { await DisplayMainView(); }
             if (data.Status == "InProgress") { CurrentGameStarted = true; }
             if (data.Status == "Ended") { CurrentGameEnded = true; }
         });
@@ -171,7 +170,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
 
         var loadingDialog = new Dialog()
         {
-            Width = 18,
+            Width = 30,
             Height = 3
         };
 
@@ -336,7 +335,7 @@ public class CurrentGameMainView : CurrentGameView
             Width = Dim.Auto(DimAutoStyle.Text),
             Height = Dim.Auto(DimAutoStyle.Text),
             Text = "Start Game",
-            // Enabled = Game.Players.Count >= 2,
+            Enabled = Game.Players.Count >= 2,
         };
 
         Console.WriteLine("\n\n\n\n" + Game.Players.Count() + "\n\n\n\n");
