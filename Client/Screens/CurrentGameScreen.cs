@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 
 using Client.Records;
 
@@ -77,7 +78,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             CurrentGameLoading = false;
             CurrentRoundAction = null;
             if (data.Status == "InProgress") { CurrentGameStarted = true; }
-            if (data.Status == "Ended") { CurrentGameEnded = true; }
+            if (data.Status == "Finished") { GameEnded(); } //CurrentGameEnded = true;
         });
 
         await hubConnection.StartAsync();
@@ -163,6 +164,8 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             await DisplayCompanyView();
         }
     }
+
+    private async void GameEnded() { Target.RemoveAll(); var loadingDialog = new Dialog() { Width = 18, Height = 3 }; var loadingText = new Label() { Text = "Fin de partie.", X = Pos.Center(), Y = Pos.Center() }; loadingDialog.Add(loadingText); Target.Add(loadingDialog); await Task.Delay(3000); var mainMenuScreen = new MainMenuScreen(Target); await mainMenuScreen.Show(); }
 
     private async Task ActInRound()
     {

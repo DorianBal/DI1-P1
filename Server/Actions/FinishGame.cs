@@ -9,6 +9,7 @@ using Server.Actions.Contracts;
 using Server.Hubs;
 using Server.Hubs.Contracts;
 using Server.Models;
+using Server.Persistence.Contracts;
 
 namespace Server.Actions;
 
@@ -23,10 +24,21 @@ public class FinishGameValidator : AbstractValidator<FinishGameParams>
     }
 }
 
-public class FinishGame(IGameHubService gameHubService) : IAction<FinishGameParams, Result<Game>>
+
+public class FinishGame(IGameHubService gameHubService, IGamesRepository gamesRepository) : IAction<FinishGameParams, Result<Game>>
 {
-    public Task<Result<Game>> PerformAsync(FinishGameParams actionParams)
+    public async Task<Result<Game>> PerformAsync(FinishGameParams actionParams)
     {
-        throw new NotImplementedException();
+        var game = actionParams.Game;
+        if (game == null)
+        {
+            return Result.Fail("Le jeu n'a pas pu être trouvé.");
+        }
+        game.Status = GameStatus.Finished;
+        await gamesRepository.SaveGame(game);
+        await gameHubService.UpdateCurrentGame(gameId: game.Id!.Value);
+        return Result.Ok(game);
     }
 }
+ 
+ 
