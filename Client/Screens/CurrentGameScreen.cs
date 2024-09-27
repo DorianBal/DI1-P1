@@ -165,7 +165,35 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         }
     }
 
-    private async void GameEnded() { Target.RemoveAll(); var loadingDialog = new Dialog() { Width = 18, Height = 3 }; var loadingText = new Label() { Text = "Fin de partie.", X = Pos.Center(), Y = Pos.Center() }; loadingDialog.Add(loadingText); Target.Add(loadingDialog); await Task.Delay(3000); var mainMenuScreen = new MainMenuScreen(Target); await mainMenuScreen.Show(); }
+    private async void GameEnded() 
+    { 
+        // Suppression de tous les écrans
+        Target.RemoveAll(); 
+
+        // Instanciation des éléments visuel
+        var loadingDialog = new Dialog() 
+        { 
+            Width = 20, 
+            Height = 3 
+        }; 
+
+        var loadingText = new Label() 
+        { 
+            Text = "Game Ended !",
+            X = Pos.Center(), 
+            Y = Pos.Center() 
+        }; 
+
+        // Affichage des éléments visuel
+        loadingDialog.Add(loadingText); 
+        Target.Add(loadingDialog); 
+
+        await Task.Delay(3000); 
+
+        // Affichage du menu d'accueil
+        var mainMenuScreen = new MainMenuScreen(Target); 
+        await mainMenuScreen.Show(); 
+    }
 
     private async Task ActInRound()
     {

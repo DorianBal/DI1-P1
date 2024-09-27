@@ -6,6 +6,7 @@ namespace Server.Models;
 
 public enum RoundActionType
 {
+    RoundAction,
     SendEmployeeForTraining,
     ParticipateInCallForTenders,
     RecruitAConsultant,

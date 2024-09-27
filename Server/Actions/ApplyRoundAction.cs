@@ -55,6 +55,8 @@ public class ApplyRoundAction(
             return Result.Fail($"Game with Id \"{gameId}\" not found.");
         }
 
+        Console.WriteLine("\n\n\n\n");
+
         if (action is SendEmployeeForTrainingRoundAction)
             Console.WriteLine("TRAINING");
         else if (action is ParticipateInCallForTendersRoundAction)
