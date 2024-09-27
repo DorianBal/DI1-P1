@@ -60,8 +60,6 @@ public class ApplyRoundAction(
 
         if (action is SendEmployeeForTrainingRoundAction)
         {
-
-
             Console.WriteLine("TRAINING");
         }
         else if (action is ParticipateInCallForTendersRoundAction)
@@ -70,27 +68,12 @@ public class ApplyRoundAction(
         else if (action is RecruitAConsultantRoundAction recruit)
         {
             Console.WriteLine("RECRUIT");
-            Console.WriteLine(action.PlayerId!.Value);
 
-            int nonNullableInt = action.PlayerId!.Value -2; // Le moins 1 c'est parcequ'il y a eu un conflit dans la bdd, a corrigé
-            Console.WriteLine(nonNullableInt);
-            Console.WriteLine(recruit);
-            Console.WriteLine(recruit.Payload.ConsultantId);
-
+            int nonNullableInt = action.PlayerId!.Value -2; // Le moins 2 car y'a un bug dans la bdd
             var consultant = await consultantsRepository.GetConsultantById(recruit.Payload.ConsultantId);
-            Console.WriteLine("\n\n idConsultant : " + consultant!.Id + "\n\n");
-
-
-            Console.WriteLine("\n\n ici");
             await consultantsRepository.DeleteConsultantById(consultant.Id);
-            // Console.WriteLine("\n\n delete consultant : " + consultant!.Id + "\n\n");
-            Console.WriteLine("\n\n la");
             await employeesRepository.SaveEmployeeFromConsultant(consultant!, nonNullableInt);
-            // Console.WriteLine("\n\n save consultant : " + consultant!.Id + "\n\n");
-            Console.WriteLine("\n\n da");
-            // Console.WriteLine("\n\nRECRUIT" + action.PlayerId + " / " + consultant!.Name);
             await gameHubService.UpdateCurrentGame(gameId: gameId);
-            Console.WriteLine("\n\n pu");
         }
 
         else if (action is FireAnEmployeeRoundAction)
