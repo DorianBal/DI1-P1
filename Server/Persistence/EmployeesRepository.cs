@@ -15,10 +15,23 @@ public class EmployeesRepository(WssDbContext context) : IEmployeesRepository
         await context.SaveChangesAsync();
     }
 
-        public async Task FireEmployee(Employee employee)
+    public async Task FireEmployee(Employee employee)
     {
         context.Remove(employee);//peut-être appeler la list employees si erreur
 
         await context.SaveChangesAsync();
+    }
+
+    public async Task SaveEmployeeFromConsultant(Consultant consultant, int idCompany)
+    {
+        var newConsultant = new Employee(consultant.Name, idCompany, consultant.GameId, consultant.SalaryRequirement);
+
+        foreach (var item in consultant.Skills)
+        {
+            newConsultant.Skills.Add(item);
+        }
+
+        Console.WriteLine("\n\nCode0124 : " + newConsultant.CompanyId);
+        await SaveEmployee(newConsultant);
     }
 }

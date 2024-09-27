@@ -165,34 +165,34 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         }
     }
 
-    private async void GameEnded() 
-    { 
+    private async void GameEnded()
+    {
         // Suppression de tous les écrans
-        Target.RemoveAll(); 
+        Target.RemoveAll();
 
         // Instanciation des éléments visuel
-        var loadingDialog = new Dialog() 
-        { 
-            Width = 20, 
-            Height = 3 
-        }; 
+        var loadingDialog = new Dialog()
+        {
+            Width = 20,
+            Height = 3
+        };
 
-        var loadingText = new Label() 
-        { 
+        var loadingText = new Label()
+        {
             Text = "Game Ended !",
-            X = Pos.Center(), 
-            Y = Pos.Center() 
-        }; 
+            X = Pos.Center(),
+            Y = Pos.Center()
+        };
 
         // Affichage des éléments visuel
-        loadingDialog.Add(loadingText); 
-        Target.Add(loadingDialog); 
+        loadingDialog.Add(loadingText);
+        Target.Add(loadingDialog);
 
-        await Task.Delay(3000); 
+        await Task.Delay(3000);
 
         // Affichage du menu d'accueil
-        var mainMenuScreen = new MainMenuScreen(Target); 
-        await mainMenuScreen.Show(); 
+        var mainMenuScreen = new MainMenuScreen(Target);
+        await mainMenuScreen.Show();
     }
 
     private async Task ActInRound()
@@ -226,13 +226,29 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             BaseAddress = new Uri($"{WssConfig.WebApiServerScheme}://{WssConfig.WebApiServerDomain}:{WssConfig.WebApiServerPort}"),
         };
 
+
+        string ValuePayload = "{}";
+        if (CurrentRoundAction == CurrentGameActionList.Action.RecruitAConsultant && CurrentView != null)
+        {
+            ValuePayload = "{\"ConsultantId\":" + CurrentView.SelectedItemId + "}";
+        }
+
+
+
+        if (CurrentRoundAction == CurrentGameActionList.Action.FireAnEmployee && CurrentView != null)
+        {
+            ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + "}";
+        }
+
+
+
         var request = httpClient.PostAsJsonAsync($"/rounds/{CurrentGame!.Rounds.MaxBy(r => r.Id)!.Id}/act", new
         {
             ActionType = CurrentRoundAction!.ToString(),
-            ActionPayload = "{}",
+            ActionPayload = ValuePayload,
             PlayerId = CurrentGame.Players.First(p => p.Name == PlayerName).Id
-            //la requête postman renvoie ce modèle de donnée avec dans actionpayload l'id de l'employee
         });
+
 
         await request;
     }
@@ -240,6 +256,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
 
 public abstract class CurrentGameView : View
 {
+    public int SelectedItemId = 0;
     public abstract Task Refresh(GameOverview game);
 }
 
@@ -366,7 +383,8 @@ public class CurrentGameMainView : CurrentGameView
             Width = Dim.Auto(DimAutoStyle.Text),
             Height = Dim.Auto(DimAutoStyle.Text),
             Text = "Start Game",
-            Enabled = Game.Players.Count >= 2,
+            // Enabled = Game.Players.Count >= 2,
+            Enabled = true,
         };
 
         Console.WriteLine("\n\n\n\n" + Game.Players.Count() + "\n\n\n\n");
@@ -667,22 +685,35 @@ public class CurrentGameCompanyView : CurrentGameView
 
         var consultantsData = new List<TreeNode>();
 
-        foreach (var consultant in Game.Consultants.ToList())
+        foreach (var consultant in Game.Consultants.ToList()) // Pour chaque consultant disponible.
         {
-            var node = new TreeNode($"{consultant.Name} | {consultant.SalaryRequirement} $");
-            var skills = consultant.Skills.ToList();
-
-            foreach (var skill in skills)
+            var node = new TreeNode($"{consultant.Name} | {consultant.SalaryRequirement} $")
             {
-                node.Children.Add(new TreeNode($"{skill.Name} | {skill.Level}"));
+                Tag = consultant.Id // Ajoute l'ID au nœud comme Tag
+            };
+            var skills = consultant.Skills.ToList(); // Récupère les compétences du consultant.
+
+            foreach (var skill in skills) // Pour chaque compétence.
+            {
+                node.Children.Add(new TreeNode($"{skill.Name} | {skill.Level}")); // Ajoute la compétence au nœud.
             }
 
-            consultantsData.Add(node);
+            consultantsData.Add(node); // Ajoute le nœud à la liste des consultants.
         }
 
-        consultantsTree.BorderStyle = LineStyle.None;
-        consultantsTree.AddObjects(consultantsData);
-        consultantsTree.ExpandAll();
+        consultantsTree.SelectionChanged += (sender, args) =>
+        {
+            if (args.NewValue is TreeNode selectedNode && selectedNode.Tag is int consultantId)
+            {
+                SelectedItemId = consultantId;
+            }
+        };
+
+        consultantsTree.BorderStyle = LineStyle.None; // Supprime le style de bordure.
+        consultantsTree.AddObjects(consultantsData); // Ajoute les nœuds au TreeView.
+        consultantsTree.ExpandAll(); // Développe tous les nœuds.
+
+
 
         Consultants.Add(consultantsTree);
 
@@ -784,7 +815,9 @@ public class CurrentGameActionList : ListView
 
 public class CurrentGameActionListDataSource : List<CurrentGameActionList.Action>, IListDataSource
 {
-    public int Length => Count;
+    public int Length => Count; // Propriété pour obtenir le nombre d'actions.
+    private HashSet<int> markedItems = new HashSet<int>(); // Pour garder une trace des éléments marqués.
+
 
     public bool SuspendCollectionChangedEvent { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -797,7 +830,8 @@ public class CurrentGameActionListDataSource : List<CurrentGameActionList.Action
 
     public bool IsMarked(int item)
     {
-        return false;
+        Console.WriteLine(item);
+        return markedItems.Contains(item); // Vérifie si l'élément est marqué.
     }
 
     public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)

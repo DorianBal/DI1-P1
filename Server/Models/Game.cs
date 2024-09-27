@@ -32,7 +32,7 @@ public class Game(string name, int rounds = 15)
 
     public bool CanBeStarted()
     {
-        return Status == GameStatus.Waiting && Players.Count >= 2;
+        return Status == GameStatus.Waiting; // && Players.Count >= 2;
     }
 
     public bool CanStartANewRound()

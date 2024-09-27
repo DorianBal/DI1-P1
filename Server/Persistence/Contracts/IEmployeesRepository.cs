@@ -6,4 +6,5 @@ public interface IEmployeesRepository
 {
     Task SaveEmployee(Employee employee);
     Task FireEmployee(Employee employee);
+    Task SaveEmployeeFromConsultant(Consultant employee, int idCompany);
 }
