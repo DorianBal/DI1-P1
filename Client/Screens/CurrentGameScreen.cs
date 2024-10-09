@@ -239,7 +239,27 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         {
             ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + "}";
         }
+        
+        if (CurrentRoundAction == CurrentGameActionList.Action.SendEmployeeForTraining && CurrentView != null)
+        {
+            //on demande avec un messagebox le skill pour lequel on veut envoyer l'employer faire son entrainement
+            var skills = new string[] { "Communication", "Programmation", "Reseau", "Cybersecurite", "Management" }; // 0,1,2,3,4
+            var numskill = MessageBox.Query(150, 5, "Formation", "Quel skill voudriez-vous faire monter d'un niveau ?", skills);
+            var nomskill = numskill switch
+            {
+                0 => "Communication",
+                1 => "Programmation",
+                2 => "Reseau",
+                3 => "Cybersecurite",
+                4 => "Management",
+                _ => "Unknown"
+            };
 
+            //ici on va ouvrir une fenêtre demandant le type de la formation et attendre la réponse puis elle sera rajouter dans valuepayload à la place du 1
+            //ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + ", \"nameofskillupgrade\":" + nomskill + "}"; ancienne version où ne passer pas nomskill car il n'y avais pas de " autour du string
+            ValuePayload = $"{{\"EmployeeId\":{CurrentView.SelectedItemId}, \"nameofskillupgrade\":\"{nomskill}\"}}";
+            Console.WriteLine("\n\n\n\n"+ValuePayload+"\n\n\n\n");
+        }
 
 
         var request = httpClient.PostAsJsonAsync($"/rounds/{CurrentGame!.Rounds.MaxBy(r => r.Id)!.Id}/act", new
@@ -640,10 +660,28 @@ public class CurrentGameCompanyView : CurrentGameView
         };
 
         var employeesData = new List<TreeNode>();
+        int selectedEmployeeId = 0; // Variable pour stocker l'employé sélectionné
 
         foreach (var employee in CurrentPlayer.Company.Employees.ToList())
         {
-            var node = new TreeNode($"{employee.Name} | {employee.Salary} $");
+            // Ajoute un préfixe [ ] ou [x] pour simuler la sélection avec des "boutons radio"
+            var isSelected = employee.Id == selectedEmployeeId ? "[x]" : "[ ]";
+            var isoccuped = employee.enformation==true ? "[statue : en formation]" : "[Statue : Libre ]";
+            if(isoccuped== "[statue : en formation]")
+            {
+                //on ne fait rien
+                Console.WriteLine("\n\nil est en formation\n\n");
+            }
+            else
+            {
+                //cependant s'il n'est pas en formation on vérifie s'il est en projet
+                isoccuped = employee.enprojet == true ? "[statue : en projet]" : "[Statue : Libre ]";
+            }
+            var node = new TreeNode($"{isSelected} {employee.Name} | {employee.Salary} $ {isoccuped}")
+            {
+                Tag = employee.Id // Ajoute l'ID au nœud comme Tag
+            };
+
             var skills = employee.Skills.ToList();
 
             foreach (var skill in skills)
@@ -653,6 +691,27 @@ public class CurrentGameCompanyView : CurrentGameView
 
             employeesData.Add(node);
         }
+
+        employeesTree.SelectionChanged += (sender, args) =>
+        {
+            if (args.NewValue is TreeNode selectedNode && selectedNode.Tag is int EmployeeId)
+            {
+                SelectedItemId = EmployeeId;
+                // Stocke l'ID de l'employé sélectionné
+                selectedEmployeeId = EmployeeId;
+
+                // Met à jour la sélection en changeant le préfixe des employés
+                foreach (var node in employeesData)
+                {
+                    node.Text = node.Tag.Equals(EmployeeId)
+                        ? node.Text.Replace("[ ]", "[x]")
+                        : node.Text.Replace("[x]", "[ ]");
+                }
+
+                // Rafraîchit l'affichage pour refléter les changements
+                employeesTree.SetNeedsDisplay();
+            }
+        };
 
         employeesTree.BorderStyle = LineStyle.None;
         employeesTree.AddObjects(employeesData);

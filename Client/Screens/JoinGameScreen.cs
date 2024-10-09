@@ -118,7 +118,7 @@ public class JoinGameScreen(Window target)
             textviewerrorlist.Visible = false;
             GamesList.Visible = true;
 
-            GamesList.Width = JoinableGames.Max(g => g.Name.Length);
+            GamesList.Width = JoinableGames.Max(g => g.Name.Length)+10;
             GamesList.Height = Math.Min(JoinableGames.Count, 20);
         }
     }
