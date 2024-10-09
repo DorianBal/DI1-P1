@@ -15,7 +15,7 @@ public enum RoundActionType
     GenerateNewConsultant,
 }
 
-[JsonDerivedType(typeof(RoundAction), typeDiscriminator: "DEFAULT")]
+[JsonDerivedType(typeof(RoundAction), typeDiscriminator: "DEFAULT")]//l'erreur du premier joueur qui fait toujours une action roundaction viens surement d'ici
 [JsonDerivedType(typeof(SendEmployeeForTrainingRoundAction), typeDiscriminator: "SendEmployeeForTraining")]
 [JsonDerivedType(typeof(ParticipateInCallForTendersRoundAction), typeDiscriminator: "ParticipateInCallForTenders")]
 [JsonDerivedType(typeof(RecruitAConsultantRoundAction), typeDiscriminator: "RecruitAConsultant")]
@@ -60,6 +60,7 @@ public class SendEmployeeForTrainingRoundAction(int? playerId) : RoundAction(pla
     public class SendEmployeeForTrainingPayload : RoundActionPayload
     {
         public int EmployeeId { get; init; }
+        public string? nameofskillupgrade { get; init; }
     }
 
     public SendEmployeeForTrainingPayload Payload { get; private set; } = null!;

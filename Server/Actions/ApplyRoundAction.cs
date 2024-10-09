@@ -1,4 +1,5 @@
 
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 
@@ -34,7 +35,8 @@ public class ApplyRoundAction(
     IGamesRepository gamesRepository,
     IGameHubService gameHubService,
     IEmployeesRepository employeesRepository,
-    IConsultantsRepository consultantsRepository
+    IConsultantsRepository consultantsRepository,
+    ICompaniesRepository companiesRepository
 ) : IAction<ApplyRoundActionParams, Result>
 {
     public async Task<Result> PerformAsync(ApplyRoundActionParams actionParams)
@@ -56,10 +58,46 @@ public class ApplyRoundAction(
             return Result.Fail($"Game with Id \"{gameId}\" not found.");
         }
 
+        //cela permet d'arrêter les entrainements de tout les employées du dernier tour pour le prochain tour
+        await employeesRepository.EndOfTraining();
+        //va être à modifier car si on met à false mtn cela va autoriser les actions vu que employee.enformation n'est plus false
+        //mais si on le met en bas cela entrainera un autre problème car dès qu'on l'a envoyée en formation il sera directement enlevée
+        //donc pour résoudre cette solution il faut bloquer les boutons fireanemployee, sendemployeefortraining et
+        //répondre à une appelle d'offre lorsque l'employee sélectionné est en formation
+
         Console.WriteLine("\n\n\n\n");
 
-        if (action is SendEmployeeForTrainingRoundAction)
+        if (action is SendEmployeeForTrainingRoundAction sendemployee)
         {
+            var employee = await employeesRepository.GetEmployeetById(sendemployee.Payload.EmployeeId);
+
+            //on vérifie si l'employée n'est pas déjà en formation
+            if (employee.enformation == false)
+            {
+                //on met à true la variable en formation afin de savoir qu'il l'est
+                employee.enformation = true;
+                //on rajoute ensuite son nouveau niveau de skill en vérifiant quel skill à été choisis
+                foreach (var skill in employee.Skills)
+                {
+                    if (skill.Name == sendemployee.Payload.nameofskillupgrade)
+                    {
+                        skill.Level += 1;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\n\nle skill " + skill.Name + " n'est pas égale au skill " + sendemployee.Payload.nameofskillupgrade + ".\n\n");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("l'employée est en formation, il ne peut pas faire une seconde formation avant d'avoir terminer celle-là");
+            }
+            //l'employee sera en formation pendant un tour donc on ne pourras pas l'envoyer faire un projet ni faire une autre formation
+            //ni le virer lors du prochain tour, lors du début du prochain tour on remettra plus haut dans le code tout les bool enformation à false
+
+            await gameHubService.UpdateCurrentGame(gameId: gameId);
+
             Console.WriteLine("TRAINING");
         }
         else if (action is ParticipateInCallForTendersRoundAction)
@@ -73,15 +111,29 @@ public class ApplyRoundAction(
             var consultant = await consultantsRepository.GetConsultantById(recruit.Payload.ConsultantId);
             await consultantsRepository.DeleteConsultantById(consultant.Id);
             await employeesRepository.SaveEmployeeFromConsultant(consultant!, nonNullableInt);
+
             await gameHubService.UpdateCurrentGame(gameId: gameId);
         }
 
-        else if (action is FireAnEmployeeRoundAction)
+        else if (action is FireAnEmployeeRoundAction Fire)
+        {
             Console.WriteLine("FIRE EMPLOYEE");
+            var employee = await employeesRepository.GetEmployeetById(Fire.Payload.EmployeeId);
+
+            if(employee.enformation==false)
+            {
+                await employeesRepository.DeleteEmployeeById(employee.Id);
+                await gameHubService.UpdateCurrentGame(gameId: gameId);
+            }
+            else
+            {
+                Console.WriteLine("l'employée est en formation, il ne peut pas être virée");
+            }
+        }
         else if (action is PassMyTurnRoundAction)
             Console.WriteLine("PASS TURN");
         else
-            Console.WriteLine("AUTRE");
+            Console.WriteLine("AUTRE");Console.WriteLine(action.ToString());
 
 
         // @todo: Implement the logic for applying the round action

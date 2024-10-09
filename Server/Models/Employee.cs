@@ -20,11 +20,15 @@ public class Employee(string name, int companyId, int gameId, int salary)
 
     public Company Company { get; set; } = null!;
 
+    public bool enformation { get; set; } = false;
+
+    public bool enprojet { get; set; } = false;
+
     public EmployeeOverview ToOverview()
     {
         return new EmployeeOverview(
             Id is null ? 0 : (int) Id, Name, Salary,
-            Skills.Select(s => s.ToOverview()).ToList()
+            Skills.Select(s => s.ToOverview()).ToList(), enformation, enprojet
         );
     }
 }

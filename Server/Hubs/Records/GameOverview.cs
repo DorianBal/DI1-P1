@@ -37,7 +37,9 @@ public sealed record EmployeeOverview(
     int Id,
     string Name,
     int Salary,
-    ICollection<SkillOverview> Skills
+    ICollection<SkillOverview> Skills,
+    bool enformation,
+    bool enprojet
 );
 
 public sealed record SkillOverview(

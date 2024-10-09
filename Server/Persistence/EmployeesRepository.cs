@@ -1,3 +1,7 @@
+using System.Numerics;
+
+using Microsoft.EntityFrameworkCore;
+
 using Server.Models;
 using Server.Persistence.Contracts;
 
@@ -33,5 +37,35 @@ public class EmployeesRepository(WssDbContext context) : IEmployeesRepository
 
         Console.WriteLine("\n\nCode0124 : " + newConsultant.CompanyId);
         await SaveEmployee(newConsultant);
+    }
+    public async Task<Employee?> GetEmployeetById(int idemployee)
+    {
+        return await context.Employees.FirstOrDefaultAsync(c => c.Id == idemployee);
+    }
+
+    public async Task<bool> DeleteEmployeeById(int? idemployee)
+    {
+        // Await the task to get the actual consultant object
+        var employee = await context.Employees.FirstOrDefaultAsync(c => c.Id == idemployee);
+
+        if (employee == null)
+        {
+            return false; // or handle the case where the consultant is not found
+        }
+
+        context.Employees.Remove(employee);
+        await context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task EndOfTraining()
+    {
+        foreach (var employee in context.Employees)
+        {
+            employee.enformation = false;
+        }
+
+        await context.SaveChangesAsync();
     }
 }
