@@ -27,6 +27,7 @@ public class FinishRoundValidator : AbstractValidator<FinishRoundParams>
 public class FinishRound(
     IRoundsRepository roundsRepository,
     ICompaniesRepository companiesRepository,
+    IEmployeesRepository employeesRepository,
     IAction<ApplyRoundActionParams, Result> applyRoundActionAction,
     IAction<StartRoundParams, Result<Round>> startRoundAction,
     IAction<FinishGameParams, Result<Game>> finishGameAction,
@@ -76,6 +77,9 @@ public class FinishRound(
         //si on créer de nouveau consultant on créer une action de tour pour le type GenerateNewConsultant
         //on ajoute cette action au round puis on sauvegarde cela dans le repos
 
+        //à chaque nouveau tour on diminue de 1 la durée de leur entrainement
+        await employeesRepository.dureetrainingreduceeachturn();
+
         foreach (var action in round.Actions)
         {
             var applyRoundActionParams = new ApplyRoundActionParams(RoundAction: action, Game: round.Game);
@@ -88,6 +92,10 @@ public class FinishRound(
         }
         //pour chaque actions dans le round on va appeler ApplyRounAction afin d'appliquer chaque action une par une
         //puis on vérifie si elles ont échoué et si oui on renvoie une erreur
+
+        //cela permet d'arrêter les entrainements de tout les employées dont la durée d'entrainement est arrivé à 0 durant ce tour
+        await employeesRepository.EndOfTraining();
+
 
         if (round.Game.CanStartANewRound())
         {

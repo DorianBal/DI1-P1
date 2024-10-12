@@ -58,13 +58,6 @@ public class ApplyRoundAction(
             return Result.Fail($"Game with Id \"{gameId}\" not found.");
         }
 
-        //cela permet d'arrêter les entrainements de tout les employées du dernier tour pour le prochain tour
-        await employeesRepository.EndOfTraining();
-        //va être à modifier car si on met à false mtn cela va autoriser les actions vu que employee.enformation n'est plus false
-        //mais si on le met en bas cela entrainera un autre problème car dès qu'on l'a envoyée en formation il sera directement enlevée
-        //donc pour résoudre cette solution il faut bloquer les boutons fireanemployee, sendemployeefortraining et
-        //répondre à une appelle d'offre lorsque l'employee sélectionné est en formation
-
         Console.WriteLine("\n\n\n\n");
 
         if (action is SendEmployeeForTrainingRoundAction sendemployee)
@@ -74,8 +67,14 @@ public class ApplyRoundAction(
             //on vérifie si l'employée n'est pas déjà en formation
             if (employee.enformation == false)
             {
+                Console.WriteLine("\n\n\n\n"+employee.dureeformation+"\n\n\n\n");
                 //on met à true la variable en formation afin de savoir qu'il l'est
                 employee.enformation = true;
+
+                //on met son nombre de tour à 1 pour qu'au prochain tour cela tombe à 0 avec la fonction dans finishround et que sa formation se terminer automatiquement grâce à la fonction après applyroundaction dans finishround
+                employee.dureeformation = 1;
+
+                Console.WriteLine("\n\n\n\nNom : "+employee.Name+" true : "+employee.enformation+" la durée de sa formation devrais être à 1 : "+employee.dureeformation+"\n\n\n\n");
                 //on rajoute ensuite son nouveau niveau de skill en vérifiant quel skill à été choisis
                 foreach (var skill in employee.Skills)
                 {
@@ -133,8 +132,9 @@ public class ApplyRoundAction(
         else if (action is PassMyTurnRoundAction)
             Console.WriteLine("PASS TURN");
         else
-            Console.WriteLine("AUTRE");Console.WriteLine(action.ToString());
-
+        {
+            Console.WriteLine("AUTRE"); Console.WriteLine(action.ToString());
+        }
 
         // @todo: Implement the logic for applying the round action
 

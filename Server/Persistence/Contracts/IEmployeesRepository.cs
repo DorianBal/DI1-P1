@@ -9,5 +9,6 @@ public interface IEmployeesRepository
     Task SaveEmployeeFromConsultant(Consultant employee, int idCompany);
     Task<Employee?> GetEmployeetById(int idemployee);
     Task<bool> DeleteEmployeeById(int? idemployee);
+    Task dureetrainingreduceeachturn();
     Task EndOfTraining();
 }

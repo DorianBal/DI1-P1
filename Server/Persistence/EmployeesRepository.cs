@@ -58,12 +58,31 @@ public class EmployeesRepository(WssDbContext context) : IEmployeesRepository
 
         return true;
     }
+    public async Task dureetrainingreduceeachturn()
+    {
+        foreach (var employee in context.Employees)
+        {
+            if (employee.dureeformation >=1)
+            {
+                employee.dureeformation-=1;
+            }
+        }
+
+        await context.SaveChangesAsync();
+    }
 
     public async Task EndOfTraining()
     {
         foreach (var employee in context.Employees)
         {
-            employee.enformation = false;
+            if(employee.enformation==true)
+            {
+                Console.WriteLine("\n\n\n\n"+employee.Name+" : nom, durée formation : "+employee.dureeformation+"\n\n\n\n");
+            }
+            if(employee.dureeformation==0)
+            {
+                employee.enformation = false;
+            }
         }
 
         await context.SaveChangesAsync();

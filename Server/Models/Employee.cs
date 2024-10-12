@@ -22,6 +22,8 @@ public class Employee(string name, int companyId, int gameId, int salary)
 
     public bool enformation { get; set; } = false;
 
+    public int dureeformation { get; set; }
+
     public bool enprojet { get; set; } = false;
 
     public EmployeeOverview ToOverview()
