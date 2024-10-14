@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Reflection.Metadata;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -82,6 +83,16 @@ public class EmployeesRepository(WssDbContext context) : IEmployeesRepository
             if(employee.dureeformation==0)
             {
                 employee.enformation = false;
+
+                //puis on met à jour son salaire :
+                var totalSkillsLevel = 0;
+
+                foreach (var skill in employee.Skills)
+                {
+                    totalSkillsLevel += skill.Level;
+                }
+
+                employee.Salary = totalSkillsLevel * 100+1500;
             }
         }
 

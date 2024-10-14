@@ -244,7 +244,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         {
             //on demande avec un messagebox le skill pour lequel on veut envoyer l'employer faire son entrainement
             var skills = new string[] { "Communication", "Programmation", "Reseau", "Cybersecurite", "Management" }; // 0,1,2,3,4
-            var numskill = MessageBox.Query(150, 5, "Formation", "Quel skill voudriez-vous faire monter d'un niveau ?", skills);
+            var numskill = MessageBox.Query(150, 5, "Training", "Which skill would you like to level up ?", skills);
             var nomskill = numskill switch
             {
                 0 => "Communication",
@@ -254,10 +254,13 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
                 4 => "Management",
                 _ => "Unknown"
             };
+            var levelplus = new string[] { "1 level = 1 turn", "2 level = 2 turn", "3 level = 3 turn" }; // 0,1,2
+            var levelplusskill = MessageBox.Query(150, 5, "Level", "How much level do you want to level up this skill ?", levelplus);
+            levelplusskill += 1;
 
             //ici on va ouvrir une fenêtre demandant le type de la formation et attendre la réponse puis elle sera rajouter dans valuepayload à la place du 1
             //ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + ", \"nameofskillupgrade\":" + nomskill + "}"; ancienne version où ne passer pas nomskill car il n'y avais pas de " autour du string
-            ValuePayload = $"{{\"EmployeeId\":{CurrentView.SelectedItemId}, \"nameofskillupgrade\":\"{nomskill}\"}}";
+            ValuePayload = $"{{\"EmployeeId\":{CurrentView.SelectedItemId}, \"nameofskillupgrade\":\"{nomskill}\", \"numberofleveltoimproveskill\":{levelplusskill}}}";
             Console.WriteLine("\n\n\n\n"+ValuePayload+"\n\n\n\n");
         }
 
@@ -666,8 +669,9 @@ public class CurrentGameCompanyView : CurrentGameView
         {
             // Ajoute un préfixe [ ] ou [x] pour simuler la sélection avec des "boutons radio"
             var isSelected = employee.Id == selectedEmployeeId ? "[x]" : "[ ]";
-            var isoccuped = employee.enformation==true ? "[statue : en formation]" : "[Statue : Libre ]";
-            if(isoccuped== "[statue : en formation]")
+            var isoccuped = employee.enformation==true ? "[statue : in training]" : "[Statue : Free]";
+            var HowmuchTurn = employee.dureeformation>=1 ? "[Duration : "+ employee.dureeformation +" Turn]" : "";
+            if (isoccuped== "[statue : in training]")
             {
                 //on ne fait rien
                 Console.WriteLine("\n\nil est en formation\n\n");
@@ -675,9 +679,9 @@ public class CurrentGameCompanyView : CurrentGameView
             else
             {
                 //cependant s'il n'est pas en formation on vérifie s'il est en projet
-                isoccuped = employee.enprojet == true ? "[statue : en projet]" : "[Statue : Libre ]";
+                isoccuped = employee.enprojet == true ? "[statue : in project]" : "[Statue : Free ]";
             }
-            var node = new TreeNode($"{isSelected} {employee.Name} | {employee.Salary} $ {isoccuped}")
+            var node = new TreeNode($"{isSelected} {employee.Name} | {employee.Salary} $ {isoccuped} {HowmuchTurn}")
             {
                 Tag = employee.Id // Ajoute l'ID au nœud comme Tag
             };
