@@ -22,7 +22,7 @@ public class Employee(string name, int companyId, int gameId, int salary)
 
     public bool enformation { get; set; } = false;
 
-    public int dureeformation { get; set; }
+    public int dureeformation { get; set; } = -1;
 
     public bool enprojet { get; set; } = false;
 
@@ -30,7 +30,7 @@ public class Employee(string name, int companyId, int gameId, int salary)
     {
         return new EmployeeOverview(
             Id is null ? 0 : (int) Id, Name, Salary,
-            Skills.Select(s => s.ToOverview()).ToList(), enformation, enprojet
+            Skills.Select(s => s.ToOverview()).ToList(), enformation, dureeformation, enprojet
         );
     }
 }

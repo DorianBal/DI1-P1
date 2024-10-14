@@ -39,6 +39,7 @@ public sealed record EmployeeOverview(
     int Salary,
     ICollection<SkillOverview> Skills,
     bool enformation,
+    int dureeformation,
     bool enprojet
 );
 

@@ -72,7 +72,7 @@ public class ApplyRoundAction(
                 employee.enformation = true;
 
                 //on met son nombre de tour à 1 pour qu'au prochain tour cela tombe à 0 avec la fonction dans finishround et que sa formation se terminer automatiquement grâce à la fonction après applyroundaction dans finishround
-                employee.dureeformation = 1;
+                employee.dureeformation = sendemployee.Payload.numberofleveltoimproveskill;
 
                 Console.WriteLine("\n\n\n\nNom : "+employee.Name+" true : "+employee.enformation+" la durée de sa formation devrais être à 1 : "+employee.dureeformation+"\n\n\n\n");
                 //on rajoute ensuite son nouveau niveau de skill en vérifiant quel skill à été choisis
@@ -80,7 +80,7 @@ public class ApplyRoundAction(
                 {
                     if (skill.Name == sendemployee.Payload.nameofskillupgrade)
                     {
-                        skill.Level += 1;
+                        skill.Level += sendemployee.Payload.numberofleveltoimproveskill;
                     }
                     else
                     {

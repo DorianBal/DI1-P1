@@ -61,6 +61,7 @@ public class SendEmployeeForTrainingRoundAction(int? playerId) : RoundAction(pla
     {
         public int EmployeeId { get; init; }
         public string? nameofskillupgrade { get; init; }
+        public int numberofleveltoimproveskill { get; init; }
     }
 
     public SendEmployeeForTrainingPayload Payload { get; private set; } = null!;
