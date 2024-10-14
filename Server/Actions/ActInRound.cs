@@ -51,10 +51,12 @@ public class ActInRound(//ici on a en paramètre les interfaces I qui implément
             return Result.Fail(actionValidationResult.Errors.Select(e => e.ErrorMessage));
         }
 
-//cela permet de séparer (explode) toutes les variables d'actionParams en variable individuelle en une seule ligne
+        //cela permet de séparer (explode) toutes les variables d'actionParams en variable individuelle en une seule ligne
         var (actionType, actionPayload, roundId, round, playerId, player) = actionParams;
 
-//si la valeur round est null alors on exécute le code se trouvant après le =
+        Console.WriteLine("\n\n\n" + actionType + ", " + playerId);
+
+        //si la valeur round est null alors on exécute le code se trouvant après le =
         //cela permet de récupérer l'objet round à partir de son Id si on n'avais pas déjà cette objet
         round ??= await roundsRepository.GetById(roundId!.Value);
 
@@ -80,22 +82,30 @@ public class ActInRound(//ici on a en paramètre les interfaces I qui implément
 
         round.Actions.Add(roundAction);
 
+        Console.WriteLine(actionType + ", " + playerId + "\n\n\n");
+
         await roundsRepository.SaveRound(round);
 
+        Console.WriteLine("REPOBUG \n\n\n" + round.Id);
+        Console.WriteLine("REPOBUG \n\n\n" + roundsRepository);
 
-//grâce à une méthode on créer en fonction de l'action du tour une variable roundAction qui est ajouté puis on l'ajoute à notre classe round
+
+        //grâce à une méthode on créer en fonction de l'action du tour une variable roundAction qui est ajouté puis on l'ajoute à notre classe round
         //cela est ensuite sauvegarder sur le repo
         if (round.EverybodyPlayed())
         {
+            Console.WriteLine("\n\n\n" + round);
             var finishRoundParams = new FinishRoundParams(Round: round);
             var finishRoundResult = await finishRoundAction.PerformAsync(finishRoundParams);
+
+            Console.WriteLine("\n\n\n" + finishRoundParams + ", " + finishRoundResult);
 
             if (finishRoundResult.IsFailed)
             {
                 return Result.Fail(finishRoundResult.Errors);
             }
         }
-         //si tout le monde à jouer son action, on appelle la classe finishRound qui va appeler la classe ApplyRoundAction
+        //si tout le monde à jouer son action, on appelle la classe finishRound qui va appeler la classe ApplyRoundAction
         //puis on vérifie si cela à réussie ou non
 
         // Mise à jour du jeux

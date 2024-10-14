@@ -58,6 +58,7 @@ public class ApplyRoundAction(
             return Result.Fail($"Game with Id \"{gameId}\" not found.");
         }
 
+
         Console.WriteLine("\n\n\n\n");
 
         if (action is SendEmployeeForTrainingRoundAction sendemployee)
@@ -95,8 +96,6 @@ public class ApplyRoundAction(
             //l'employee sera en formation pendant un tour donc on ne pourras pas l'envoyer faire un projet ni faire une autre formation
             //ni le virer lors du prochain tour, lors du début du prochain tour on remettra plus haut dans le code tout les bool enformation à false
 
-            await gameHubService.UpdateCurrentGame(gameId: gameId);
-
             Console.WriteLine("TRAINING");
         }
         else if (action is ParticipateInCallForTendersRoundAction)
@@ -110,8 +109,6 @@ public class ApplyRoundAction(
             var consultant = await consultantsRepository.GetConsultantById(recruit.Payload.ConsultantId);
             await consultantsRepository.DeleteConsultantById(consultant.Id);
             await employeesRepository.SaveEmployeeFromConsultant(consultant!, nonNullableInt);
-
-            await gameHubService.UpdateCurrentGame(gameId: gameId);
         }
 
         else if (action is FireAnEmployeeRoundAction Fire)
@@ -122,7 +119,6 @@ public class ApplyRoundAction(
             if(employee.enformation==false)
             {
                 await employeesRepository.DeleteEmployeeById(employee.Id);
-                await gameHubService.UpdateCurrentGame(gameId: gameId);
             }
             else
             {
@@ -135,8 +131,6 @@ public class ApplyRoundAction(
         {
             Console.WriteLine("AUTRE"); Console.WriteLine(action.ToString());
         }
-
-        // @todo: Implement the logic for applying the round action
 
         await gameHubService.UpdateCurrentGame(gameId: gameId);
 
