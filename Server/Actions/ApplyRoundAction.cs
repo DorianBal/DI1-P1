@@ -142,28 +142,4 @@ public class ApplyRoundAction(
 
         return Result.Ok();
     }
-
-    /*
-    public void ImplementeRoundAction(FireAnEmployeeRoundAction action, Game game)
-     //on doit modifier le modèle de l'action sinon on ne peut pas récupérer les données comme par exemple action.payload.employeeid
-     //donc il faut détecter le type d'action avant ou avec un switch ou une autre solution ?
-    {
-        if (action is RecruitAConsultantRoundAction)
-        {
-            //on écris ici le code associé
-        }
-        else if (action is FireAnEmployeeRoundAction)//donc cela ne sert plus à rien
-        {
-            action.Payload.EmployeeId //grâce à ça on doit récupérer l'employé qui va être virée afin de faie fonctionner le code ci-dessous
-            Consultant unconsultant = new Consultant(employee.Name, employee.Salary, employee.GameId);
-            consultantsRepository.SaveConsultant(unconsultant);
-
-            employeesRepository.FireEmployee(employee);
-            //il faudrait pouvoir appeler le repository pour mettre à jour cela, supprimer l'employée et le rajouter en tant que consultant
-        }
-        else
-        {
-            //on balance une erreur
-        }
-    }*/
 }
