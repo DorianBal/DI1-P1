@@ -76,7 +76,7 @@ public class CreateCompany(
             var createEmployeeParams = new CreateEmployeeParams(nameList[randomName], Company: company);
             var createEmployeeResult = await createEmployeeAction.PerformAsync(createEmployeeParams);
 
-            // // Génère un nombre de Projects aléatoire en fonction du nombre de joueurs dans la partie
+            // Génère un nombre de Projects aléatoire en fonction du nombre de joueurs dans la partie
 
             // List<String> nameList2 = ["Projet Bis", "Projet Exodus", "Projet T-800"];
             // int randomName2 = new Random().Next(0, nameList2.Count);

@@ -599,7 +599,7 @@ public class CurrentGameCompanyView : CurrentGameView
 
         SetupEmployees();
         SetupConsultants();
-        SetupCallForTenders();
+        // SetupCallForTenders();
 
         Body!.Add(LeftBody);
     }
@@ -755,7 +755,7 @@ public class CurrentGameCompanyView : CurrentGameView
 
                 //on appelle setupconsultant afin d'enlever la sélection du consultant
                 SetupConsultants();
-                SetupCallForTenders();
+                // SetupCallForTenders();
                 // Rafraîchit l'affichage pour refléter les changements
                 employeesTree.SetNeedsDisplay();
             }
@@ -829,7 +829,7 @@ public class CurrentGameCompanyView : CurrentGameView
 
                 //on appelle setupemployee afin d'enlever la sélection de l'employée
                 SetupEmployees();
-                SetupCallForTenders();
+                // SetupCallForTenders();
                 // Rafraîchit l'affichage pour refléter les changements
                 consultantsTree.SetNeedsDisplay();
             }
@@ -846,83 +846,83 @@ public class CurrentGameCompanyView : CurrentGameView
         LeftBody!.Add(Consultants);
     }
 
-    private void SetupCallForTenders()
-    {
-        CallForTenders = new()
-        {
-            Title = "Call For Tenders",
-            X = Pos.Left(Consultants!),
-            Y = Pos.Bottom(Consultants!) + 1,
-            Width = Dim.Fill(),
-            Height = Dim.Percent(30)
-        };
+    // private void SetupCallForTenders()
+    // {
+    //     CallForTenders = new()
+    //     {
+    //         Title = "Call For Tenders",
+    //         X = Pos.Left(Consultants!),
+    //         Y = Pos.Bottom(Consultants!) + 1,
+    //         Width = Dim.Fill(),
+    //         Height = Dim.Percent(30)
+    //     };
 
-        var callfortendersTree = new TreeView()
-        {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill(),
-            Height = Dim.Fill(),
-            BorderStyle = LineStyle.Dotted
-        };
+    //     var callfortendersTree = new TreeView()
+    //     {
+    //         X = 0,
+    //         Y = 0,
+    //         Width = Dim.Fill(),
+    //         Height = Dim.Fill(),
+    //         BorderStyle = LineStyle.Dotted
+    //     };
 
-        //Ci-dessous il suffit d'appeler Game.project.ToList() et de faire la boucle foreach avec les infos de projets
+    //     //Ci-dessous il suffit d'appeler Game.project.ToList() et de faire la boucle foreach avec les infos de projets
 
-        var callfortendersData = new List<TreeNode>();
-        int selectedCallFortendersId = 0; // Variable pour stocker le projet sélectionné
+    //     var callfortendersData = new List<TreeNode>();
+    //     int selectedCallFortendersId = 0; // Variable pour stocker le projet sélectionné
 
-        foreach (var project in Game.Projects.ToList())
-        {
-            var isSelected = project.Id == selectedCallFortendersId ? "[x]" : "[ ]";
-            var node = new TreeNode($"{isSelected} {project.Name} | {project.Revenu} $")
-            {
-                Tag = project.Id // Ajoute l'ID au nœud comme Tag
-            };
-            var skills = project.Skills.ToList(); // Récupère les compétences nécessaire au projet.
+    //     foreach (var project in Game.Projects.ToList())
+    //     {
+    //         var isSelected = project.Id == selectedCallFortendersId ? "[x]" : "[ ]";
+    //         var node = new TreeNode($"{isSelected} {project.Name} | {project.Revenu} $")
+    //         {
+    //             Tag = project.Id // Ajoute l'ID au nœud comme Tag
+    //         };
+    //         var skills = project.Skills.ToList(); // Récupère les compétences nécessaire au projet.
 
-            foreach (var skill in skills) // Pour chaque compétence.
-            {
-                node.Children.Add(new TreeNode($"{skill.Name} | {skill.Level}")); // Ajoute la compétence au nœud.
-            }
+    //         foreach (var skill in skills) // Pour chaque compétence.
+    //         {
+    //             node.Children.Add(new TreeNode($"{skill.Name} | {skill.Level}")); // Ajoute la compétence au nœud.
+    //         }
 
-            callfortendersData.Add(node); // Ajoute le nœud à la liste des projets.
-        }
+    //         callfortendersData.Add(node); // Ajoute le nœud à la liste des projets.
+    //     }
 
-        callfortendersTree.SelectionChanged += (sender, args) =>
-        {
-            if (args.NewValue is TreeNode selectedNode && selectedNode.Tag is int callfortendersId)
-            {
-                SelectedItemId = callfortendersId;
+    //     callfortendersTree.SelectionChanged += (sender, args) =>
+    //     {
+    //         if (args.NewValue is TreeNode selectedNode && selectedNode.Tag is int callfortendersId)
+    //         {
+    //             SelectedItemId = callfortendersId;
 
-                // Stocke l'ID de l'employé sélectionné
-                selectedCallFortendersId = callfortendersId;
+    //             // Stocke l'ID de l'employé sélectionné
+    //             selectedCallFortendersId = callfortendersId;
 
-                // Met à jour la sélection en changeant le préfixe des employés
-                foreach (var node in callfortendersData)
-                {
-                    node.Text = node.Tag.Equals(callfortendersId)
-                        ? node.Text.Replace("[ ]", "[x]")
-                        : node.Text.Replace("[x]", "[ ]");
-                }
+    //             // Met à jour la sélection en changeant le préfixe des employés
+    //             foreach (var node in callfortendersData)
+    //             {
+    //                 node.Text = node.Tag.Equals(callfortendersId)
+    //                     ? node.Text.Replace("[ ]", "[x]")
+    //                     : node.Text.Replace("[x]", "[ ]");
+    //             }
 
-                //on appelle setupemployee et setupconsultant afin d'enlever la sélection de l'employée
-                SetupEmployees();
-                SetupConsultants();
-                // Rafraîchit l'affichage pour refléter les changements
-                callfortendersTree.SetNeedsDisplay();
-            }
-        };
+    //             //on appelle setupemployee et setupconsultant afin d'enlever la sélection de l'employée
+    //             SetupEmployees();
+    //             SetupConsultants();
+    //             // Rafraîchit l'affichage pour refléter les changements
+    //             callfortendersTree.SetNeedsDisplay();
+    //         }
+    //     };
 
-        callfortendersTree.BorderStyle = LineStyle.None; // Supprime le style de bordure.
-        callfortendersTree.AddObjects(callfortendersData); // Ajoute les nœuds au TreeView.
-        callfortendersTree.ExpandAll(); // Développe tous les nœuds.
+    //     callfortendersTree.BorderStyle = LineStyle.None; // Supprime le style de bordure.
+    //     callfortendersTree.AddObjects(callfortendersData); // Ajoute les nœuds au TreeView.
+    //     callfortendersTree.ExpandAll(); // Développe tous les nœuds.
 
 
 
-        Consultants.Add(callfortendersTree);
+    //     Consultants.Add(callfortendersTree);
 
-        LeftBody!.Add(CallForTenders);
-    }
+    //     LeftBody!.Add(CallForTenders);
+    // }
 
     private void SetupActions()
     {
