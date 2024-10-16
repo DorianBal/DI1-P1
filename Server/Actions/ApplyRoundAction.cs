@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
+using System.Text.Json;
 
 using FluentResults;
 

@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 using Client.Records;
 
@@ -239,7 +241,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         {
             ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + "}";
         }
-        
+
         if (CurrentRoundAction == CurrentGameActionList.Action.SendEmployeeForTraining && CurrentView != null)
         {
             //on demande avec un messagebox le skill pour lequel on veut envoyer l'employer faire son entrainement
@@ -261,7 +263,46 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             //ici on va ouvrir une fenêtre demandant le type de la formation et attendre la réponse puis elle sera rajouter dans valuepayload à la place du 1
             //ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + ", \"nameofskillupgrade\":" + nomskill + "}"; ancienne version où ne passer pas nomskill car il n'y avais pas de " autour du string
             ValuePayload = $"{{\"EmployeeId\":{CurrentView.SelectedItemId}, \"nameofskillupgrade\":\"{nomskill}\", \"numberofleveltoimproveskill\":{levelplusskill}}}";
-            Console.WriteLine("\n\n\n\n"+ValuePayload+"\n\n\n\n");
+            Console.WriteLine("\n\n\n\n" + ValuePayload + "\n\n\n\n");
+        }
+
+        if (CurrentRoundAction == CurrentGameActionList.Action.ParticipateInCallForTenders && CurrentView != null)
+        {
+            var employees = new List<EmployeeOverview>();
+            PlayerOverview leCurrentPlayer = CurrentGame!.Players.First(p => p.Name == PlayerName);
+            foreach (var employee in leCurrentPlayer.Company.Employees.ToList())
+            {
+                employees.Add(employee);
+            }
+
+            var employeesAvailable = new List<string>();
+
+            foreach (var employee in employees)
+            {
+                if (employee.enprojet == false && employee.enformation == false)
+                {
+                    var skillsemployee = new List<String>();
+                    var skills = employee.Skills.ToList();
+
+                    foreach (var skill in skills)
+                    {
+                        skillsemployee.Add($"{skill.Name} | {skill.Level}");
+                    }
+                    employeesAvailable.Add($"{employee.Name} - Skills: \n{string.Join("\n ", skillsemployee)}");
+                }
+                else
+                {
+                    //on ne fait rien l'employée n'est pas disponible=>rajouter une sécurité car il est possible que aucun employée ne soit disponible et qu'on soit bloquer dans la messagebox
+                }
+            }
+
+            var employeeListString = employeesAvailable.ToArray();
+
+            var employeeselectionnedfortheproject = MessageBox.Query(180, 10, "Call For tenders", "Which employee do you want to send to do this project", employeeListString);
+            //je ne sais pas encore comment on va récupérer l'employeeid car on ne peut pas faire de recherche par nom car des employées peuvent avoir un même nom=>donc potentiellement rajoutée plus haut dans employeesAvailable une liste employee ID et si le résultat de la messagebox est le numéro de la réponse (réponse 0,1,2etc) on va faire listemployeeid[num de la réponse] afin de récupérer l'id correspondant à l'employée cliquer
+
+            ValuePayload = $"{{\"CallForTendersId\":{CurrentView.SelectedItemId}, \"employeeid\":\"{employeeselectionnedfortheproject}\"}}";
+            Console.WriteLine("\n\n\n\nYO : " + ValuePayload + "\n\n\n\n");
         }
 
 
@@ -669,9 +710,9 @@ public class CurrentGameCompanyView : CurrentGameView
         {
             // Ajoute un préfixe [ ] ou [x] pour simuler la sélection avec des "boutons radio"
             var isSelected = employee.Id == selectedEmployeeId ? "[x]" : "[ ]";
-            var isoccuped = employee.enformation==true ? "[statue : in training]" : "[Statue : Free]";
-            var HowmuchTurn = employee.dureeformation>=1 ? "[Duration : "+ employee.dureeformation +" Turn]" : "";
-            if (isoccuped== "[statue : in training]")
+            var isoccuped = employee.enformation == true ? "[statue : in training]" : "[Statue : Free]";
+            var HowmuchTurn = employee.dureeformation >= 1 ? "[Duration : " + employee.dureeformation + " Turn]" : "";
+            if (isoccuped == "[statue : in training]")
             {
                 //on ne fait rien
                 Console.WriteLine("\n\nil est en formation\n\n");
@@ -712,6 +753,9 @@ public class CurrentGameCompanyView : CurrentGameView
                         : node.Text.Replace("[x]", "[ ]");
                 }
 
+                //on appelle setupconsultant afin d'enlever la sélection du consultant
+                SetupConsultants();
+                SetupCallForTenders();
                 // Rafraîchit l'affichage pour refléter les changements
                 employeesTree.SetNeedsDisplay();
             }
@@ -747,10 +791,12 @@ public class CurrentGameCompanyView : CurrentGameView
         };
 
         var consultantsData = new List<TreeNode>();
+        int selectedConsultantId = 0; // Variable pour stocker le consultant sélectionné
 
         foreach (var consultant in Game.Consultants.ToList()) // Pour chaque consultant disponible.
         {
-            var node = new TreeNode($"{consultant.Name} | {consultant.SalaryRequirement} $")
+            var isSelected = consultant.Id == selectedConsultantId ? "[x]" : "[ ]";
+            var node = new TreeNode($"{isSelected} {consultant.Name} | {consultant.SalaryRequirement} $")
             {
                 Tag = consultant.Id // Ajoute l'ID au nœud comme Tag
             };
@@ -769,6 +815,23 @@ public class CurrentGameCompanyView : CurrentGameView
             if (args.NewValue is TreeNode selectedNode && selectedNode.Tag is int consultantId)
             {
                 SelectedItemId = consultantId;
+
+                // Stocke l'ID de l'employé sélectionné
+                selectedConsultantId = consultantId;
+
+                // Met à jour la sélection en changeant le préfixe des employés
+                foreach (var node in consultantsData)
+                {
+                    node.Text = node.Tag.Equals(consultantId)
+                        ? node.Text.Replace("[ ]", "[x]")
+                        : node.Text.Replace("[x]", "[ ]");
+                }
+
+                //on appelle setupemployee afin d'enlever la sélection de l'employée
+                SetupEmployees();
+                SetupCallForTenders();
+                // Rafraîchit l'affichage pour refléter les changements
+                consultantsTree.SetNeedsDisplay();
             }
         };
 
@@ -793,6 +856,70 @@ public class CurrentGameCompanyView : CurrentGameView
             Width = Dim.Fill(),
             Height = Dim.Percent(30)
         };
+
+        var callfortendersTree = new TreeView()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill(),
+            Height = Dim.Fill(),
+            BorderStyle = LineStyle.Dotted
+        };
+
+        //Ci-dessous il suffit d'appeler Game.project.ToList() et de faire la boucle foreach avec les infos de projets
+
+        var callfortendersData = new List<TreeNode>();
+        int selectedCallFortendersId = 0; // Variable pour stocker le projet sélectionné
+
+        foreach (var project in Game.Projects.ToList())
+        {
+            var isSelected = project.Id == selectedCallFortendersId ? "[x]" : "[ ]";
+            var node = new TreeNode($"{isSelected} {project.Name} | {project.Revenu} $")
+            {
+                Tag = project.Id // Ajoute l'ID au nœud comme Tag
+            };
+            var skills = project.Skills.ToList(); // Récupère les compétences nécessaire au projet.
+
+            foreach (var skill in skills) // Pour chaque compétence.
+            {
+                node.Children.Add(new TreeNode($"{skill.Name} | {skill.Level}")); // Ajoute la compétence au nœud.
+            }
+
+            callfortendersData.Add(node); // Ajoute le nœud à la liste des projets.
+        }
+
+        callfortendersTree.SelectionChanged += (sender, args) =>
+        {
+            if (args.NewValue is TreeNode selectedNode && selectedNode.Tag is int callfortendersId)
+            {
+                SelectedItemId = callfortendersId;
+
+                // Stocke l'ID de l'employé sélectionné
+                selectedCallFortendersId = callfortendersId;
+
+                // Met à jour la sélection en changeant le préfixe des employés
+                foreach (var node in callfortendersData)
+                {
+                    node.Text = node.Tag.Equals(callfortendersId)
+                        ? node.Text.Replace("[ ]", "[x]")
+                        : node.Text.Replace("[x]", "[ ]");
+                }
+
+                //on appelle setupemployee et setupconsultant afin d'enlever la sélection de l'employée
+                SetupEmployees();
+                SetupConsultants();
+                // Rafraîchit l'affichage pour refléter les changements
+                callfortendersTree.SetNeedsDisplay();
+            }
+        };
+
+        callfortendersTree.BorderStyle = LineStyle.None; // Supprime le style de bordure.
+        callfortendersTree.AddObjects(callfortendersData); // Ajoute les nœuds au TreeView.
+        callfortendersTree.ExpandAll(); // Développe tous les nœuds.
+
+
+
+        Consultants.Add(callfortendersTree);
 
         LeftBody!.Add(CallForTenders);
     }
