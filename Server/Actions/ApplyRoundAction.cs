@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
+using System.Text.Json;
 
 using FluentResults;
 
@@ -63,43 +64,45 @@ public class ApplyRoundAction(
 
         Console.WriteLine("\n\n\n\n");
 
-        // if (action.ActionType == "RecruitAConsultant")
-        // {
-        //     var employee = await employeesRepository.GetEmployeetById(sendemployee.Payload.EmployeeId);
+        if (action.ActionType == "SendEmployeeForTraining")
+        {
+            var dictionnairePayload = JsonSerializer.Deserialize<Dictionary<string, object>>(action.Payload);
+            int employeeid = Convert.ToInt32(dictionnairePayload["EmployeeId"].ToString());
+            var employee = await employeesRepository.GetEmployeetById(employeeid);
 
-        //     //on vérifie si l'employée n'est pas déjà en formation
-        //     if (employee.enformation == false)
-        //     {
-        //         Console.WriteLine("\n\n\n\n"+employee.dureeformation+"\n\n\n\n");
-        //         //on met à true la variable en formation afin de savoir qu'il l'est
-        //         employee.enformation = true;
+            //on vérifie si l'employée n'est pas déjà en formation
+            if (employee.enformation == false)
+            {
+                Console.WriteLine("\n\n\n\n" + employee.dureeformation + "\n\n\n\n");
+                //on met à true la variable en formation afin de savoir qu'il l'est
+                employee.enformation = true;
 
-        //         //on met son nombre de tour à 1 pour qu'au prochain tour cela tombe à 0 avec la fonction dans finishround et que sa formation se terminer automatiquement grâce à la fonction après applyroundaction dans finishround
-        //         employee.dureeformation = sendemployee.Payload.numberofleveltoimproveskill;
+                //on met son nombre de tour à 1 pour qu'au prochain tour cela tombe à 0 avec la fonction dans finishround et que sa formation se terminer automatiquement grâce à la fonction après applyroundaction dans finishround
+                employee.dureeformation = Convert.ToInt32(dictionnairePayload["numberofleveltoimproveskill"].ToString());
 
-        //         Console.WriteLine("\n\n\n\nNom : "+employee.Name+" true : "+employee.enformation+" la durée de sa formation devrais être à 1 : "+employee.dureeformation+"\n\n\n\n");
-        //         //on rajoute ensuite son nouveau niveau de skill en vérifiant quel skill à été choisis
-        //         foreach (var skill in employee.Skills)
-        //         {
-        //             if (skill.Name == sendemployee.Payload.nameofskillupgrade)
-        //             {
-        //                 skill.Level += sendemployee.Payload.numberofleveltoimproveskill;
-        //             }
-        //             else
-        //             {
-        //                 Console.WriteLine("\n\nle skill " + skill.Name + " n'est pas égale au skill " + sendemployee.Payload.nameofskillupgrade + ".\n\n");
-        //             }
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Console.WriteLine("l'employée est en formation, il ne peut pas faire une seconde formation avant d'avoir terminer celle-là");
-        //     }
-        //     //l'employee sera en formation pendant un tour donc on ne pourras pas l'envoyer faire un projet ni faire une autre formation
-        //     //ni le virer lors du prochain tour, lors du début du prochain tour on remettra plus haut dans le code tout les bool enformation à false
+                Console.WriteLine("\n\n\n\nNom : " + employee.Name + " true : " + employee.enformation + " la durée de sa formation devrais être à 1 : " + employee.dureeformation + "\n\n\n\n");
+                //on rajoute ensuite son nouveau niveau de skill en vérifiant quel skill à été choisis
+                foreach (var skill in employee.Skills)
+                {
+                    if (skill.Name == Convert.ToString(dictionnairePayload["nameofskillupgrade"]))
+                    {
+                        skill.Level += Convert.ToInt32(dictionnairePayload["numberofleveltoimproveskill"].ToString());
+                    }
+                    else
+                    {
+                        Console.WriteLine("\n\nle skill " + skill.Name + " n'est pas égale au skill " + Convert.ToString(dictionnairePayload["nameofskillupgrade"]) + ".\n\n");
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("l'employée est en formation, il ne peut pas faire une seconde formation avant d'avoir terminer celle-là");
+            }
+            //l'employee sera en formation pendant un tour donc on ne pourras pas l'envoyer faire un projet ni faire une autre formation
+            //ni le virer lors du prochain tour, lors du début du prochain tour on remettra plus haut dans le code tout les bool enformation à false
 
-        //     Console.WriteLine("TRAINING");
-        // }
+            Console.WriteLine("TRAINING");
+        }
         // else if (action.ActionType == "ParticipateInCallForTenders")
         //     Console.WriteLine("TENDERS");
 
