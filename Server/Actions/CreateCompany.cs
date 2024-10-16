@@ -28,6 +28,7 @@ public class CreateCompany(
   ICompaniesRepository companiesRepository,
   IPlayersRepository playersRepository,
   IAction<CreateEmployeeParams, Result<Employee>> createEmployeeAction,
+    IAction<CreateProjectParams, Result<Project>> createProjectAction,
   IGameHubService gameHubService
 ) : IAction<CreateCompanyParams, Result<Company>>
 {
@@ -75,11 +76,22 @@ public class CreateCompany(
             var createEmployeeParams = new CreateEmployeeParams(nameList[randomName], Company: company);
             var createEmployeeResult = await createEmployeeAction.PerformAsync(createEmployeeParams);
 
+            // // Génère un nombre de Projects aléatoire en fonction du nombre de joueurs dans la partie
+
+            // List<String> nameList2 = ["Projet Bis", "Projet Exodus", "Projet T-800"];
+            // int randomName2 = new Random().Next(0, nameList2.Count);
+
+            // var createProjectParams2 = new CreateProjectParams(nameList2[randomName2], 12, null);
+            // var createProjectResult2 = await createProjectAction.PerformAsync(createProjectParams2);
+
             if (createEmployeeResult.IsFailed)
             {
                 return Result.Fail(createEmployeeResult.Errors);
             }
         }
+
+
+
 
         await gameHubService.UpdateCurrentGame(gameId: player.GameId);
 

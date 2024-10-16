@@ -73,7 +73,7 @@ public class GamesRepository(WssDbContext context) : IGamesRepository
         .FirstOrDefaultAsync(g => g.Id == gameId);
     }
 
-    public async Task<Game?> GetProjects(int gameId)
+    public async Task<Game?> GetProject(int gameId)
     {
         return await context.Games
         .Include(g => g.Projects)

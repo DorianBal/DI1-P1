@@ -12,5 +12,5 @@ public interface IGamesRepository
     Task<Game?> GetByPlayerId(int playerId);
     Task SaveGame(Game game);
     Task<Game?> GetConsultant(int gameId);
-    Task<Game?> GetProjects(int gameId);
+    Task<Game?> GetProject(int gameId);
 }

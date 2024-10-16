@@ -91,6 +91,8 @@ public class FinishRound(
             }
         }
 
+        await employeesRepository.EndOfTraining();
+
         if (round.Game.CanStartANewRound())
         {
             var startRoundActionParams = new StartRoundParams(Game: round.Game);

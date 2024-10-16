@@ -79,6 +79,26 @@ public class StartRound(
                 }
                 await gameHubService.UpdateCurrentGame(gameId: round.GameId);
             }
+
+
+
+            // Récupère la liste des projets pour le jeu actuel
+            // var NbProjects = await gamesRepository.GetProject(game.Id!.Value);
+            // var projectsList = NbProjects!.Projects.ToList();
+            // Console.WriteLine("\n\n\n\t\tProjectsList : " + projectsList + "\n\n\n\t\t");
+
+            // foreach (var project in projectsList)
+            // {
+            //     var removeProjectsParams = new RemoveProjectParams(project, gameId, game);
+            //     var removeProjectsResult = await removeProject.PerformAsync(removeProjectsParams);
+
+            //     if (removeProjectsResult.IsFailed)
+            //     {
+            //         Console.WriteLine($"Impossible de supprimer le project : {project.Id}: {string.Join(", ", removeProjectsResult.Errors.Select(e => e.Message))}");
+            //         continue;
+            //     }
+            //     await gameHubService.UpdateCurrentGame(gameId: round.GameId);
+            // }
         }
         catch (Exception ex)
         {
@@ -95,43 +115,16 @@ public class StartRound(
             var createConsultantResult = await consultant.PerformAsync(createConsultantParams);
         }
 
+        //         // Génère un nombre de Projects aléatoire en fonction du nombre de joueurs dans la partie
+        // for (var i = 0; i <= game.Players.Count; i++)
+        // {
+        //     List<String> nameList = ["Projet Bis", "Projet Exodus", "Projet T-800"];
+        //     int randomName = new Random().Next(0, nameList.Count);
 
+        //     var createProjectParams = new CreateProjectParams(nameList[randomName], gameId, game);
+        //     var createProjectResult = await project.PerformAsync(createProjectParams);
+        // }
 
-        try
-        {
-            // Récupère la liste des projets pour le jeu actuel
-            var NbProjects = await gamesRepository.GetProjects(game.Id!.Value);
-            Console.WriteLine(NbProjects);
-            var projectsList = NbProjects!.Projects.ToList();
-            Console.WriteLine(projectsList);
-
-            foreach (var project in projectsList)
-            {
-                var removeProjectsParams = new RemoveProjectParams(project, gameId, game);
-                var removeProjectsResult = await removeProject.PerformAsync(removeProjectsParams);
-
-                if (removeProjectsResult.IsFailed)
-                {
-                    Console.WriteLine($"Impossible de supprimer le project : {project.Id}: {string.Join(", ", removeProjectsResult.Errors.Select(e => e.Message))}");
-                    continue;
-                }
-                await gameHubService.UpdateCurrentGame(gameId: round.GameId);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Erreur lors de la suppression des projects : " + ex.Message);
-        }
-
-        // Génère un nombre de Projects aléatoire en fonction du nombre de joueurs dans la partie
-        for (var i = 0; i <= game.Players.Count; i++)
-        {
-            List<String> nameList = ["Projet Bis", "Projet Exodus", "Projet T-800"];
-            int randomName = new Random().Next(0, nameList.Count);
-
-            var createProjectParams = new CreateProjectParams(nameList[randomName], gameId, game);
-            var createProjectResult = await project.PerformAsync(createProjectParams);
-        }
 
         // Enregistre et actualise le tour
         await roundsRepository.SaveRound(round);
