@@ -19,6 +19,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddTransient<ICompaniesRepository, CompaniesRepository>();
 builder.Services.AddTransient<IConsultantsRepository, ConsultantsRepository>();
+builder.Services.AddTransient<IProjectsRepository, ProjectsRepository>();
 builder.Services.AddTransient<IEmployeesRepository, EmployeesRepository>();
 builder.Services.AddTransient<IGamesRepository, GamesRepository>();
 builder.Services.AddTransient<IPlayersRepository, PlayersRepository>();
@@ -38,6 +39,8 @@ builder.Services.AddTransient<IAction<StartGameParams, Result<Game>>, StartGame>
 builder.Services.AddTransient<IAction<StartRoundParams, Result<Round>>, StartRound>();
 builder.Services.AddTransient<IAction<CreateConsultantParams, Result<Consultant>>,CreateConsultant>(); // Nécessaire pour créer un consultant
 builder.Services.AddTransient<IAction<RemoveConsultantParams, Result<Consultant>>,RemoveConsultant>(); // Nécessaire pour supprimer un consultant
+builder.Services.AddTransient<IAction<CreateProjectParams, Result<Project>>,CreateProject>(); // Nécessaire pour créer un projet
+builder.Services.AddTransient<IAction<RemoveProjectParams, Result<Project>>,RemoveProject>(); // Nécessaire pour supprimer un projet
 
 builder.Services.AddTransient<IGameHubService, GameHubService>();
 builder.Services.AddTransient<IMainHubService, MainHubService>();

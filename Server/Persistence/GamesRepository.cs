@@ -66,10 +66,17 @@ public class GamesRepository(WssDbContext context) : IGamesRepository
         await context.SaveChangesAsync();
     }
 
-        public async Task<Game?> GetConsultant(int gameId)
+    public async Task<Game?> GetConsultant(int gameId)
     {
         return await context.Games
         .Include(g => g.Consultants)
+        .FirstOrDefaultAsync(g => g.Id == gameId);
+    }
+
+    public async Task<Game?> GetProjects(int gameId)
+    {
+        return await context.Games
+        .Include(g => g.Projects)
         .FirstOrDefaultAsync(g => g.Id == gameId);
     }
 }

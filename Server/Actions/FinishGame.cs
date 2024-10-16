@@ -40,5 +40,3 @@ public class FinishGame(IGameHubService gameHubService, IGamesRepository gamesRe
         return Result.Ok(game);
     }
 }
- 
- 

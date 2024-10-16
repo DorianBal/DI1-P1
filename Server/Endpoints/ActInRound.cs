@@ -10,12 +10,6 @@ using Server.Endpoints.Contracts;
 using Server.Models;
 using Server.Persistence;
 
-using static Server.Models.FireAnEmployeeRoundAction;
-using static Server.Models.ParticipateInCallForTendersRoundAction;
-using static Server.Models.RecruitAConsultantRoundAction;
-using static Server.Models.RoundAction;
-using static Server.Models.SendEmployeeForTrainingRoundAction;
-
 namespace Server.Endpoints;
 
 public class ActInRound : IEndpoint
@@ -41,19 +35,9 @@ public class ActInRound : IEndpoint
             return Results.BadRequest(new { Errors = new[] { "Invalid action type" } });
         }
 
-        var parsedActionPayload = parsedActionType switch
-        {
-            RoundActionType.SendEmployeeForTraining => JsonSerializer.Deserialize<SendEmployeeForTrainingPayload>(body.ActionPayload),
-            RoundActionType.ParticipateInCallForTenders => JsonSerializer.Deserialize<ParticipateInCallForTendersPayload>(body.ActionPayload),
-            RoundActionType.RecruitAConsultant => JsonSerializer.Deserialize<RecruitAConsultantPayload>(body.ActionPayload),
-            RoundActionType.FireAnEmployee => JsonSerializer.Deserialize<FireAnEmployeePayload>(body.ActionPayload),
-            RoundActionType.PassMyTurn => JsonSerializer.Deserialize<RoundActionPayload>(body.ActionPayload),
-            _ => JsonSerializer.Deserialize<RoundActionPayload>(body.ActionPayload)
-        };
-
         var actionParams = new ActInRoundParams(
-            parsedActionType,
-            parsedActionPayload!,
+            body.ActionType,
+            body.ActionPayload!,
             roundId,
             PlayerId: body.PlayerId
         );

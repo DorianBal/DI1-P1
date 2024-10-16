@@ -43,6 +43,14 @@ public sealed record EmployeeOverview(
     bool enprojet
 );
 
+public sealed record ProjectOverview(
+    int Id,
+    string Name,
+    int Revenu,
+    ICollection<SkillOverview> Skills,
+    int dureeformation
+);
+
 public sealed record SkillOverview(
     string Name,
     int Level

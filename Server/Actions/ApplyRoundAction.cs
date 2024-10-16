@@ -36,6 +36,7 @@ public class ApplyRoundAction(
     IGameHubService gameHubService,
     IEmployeesRepository employeesRepository,
     IConsultantsRepository consultantsRepository,
+    IProjectsRepository projectsRepository,
     ICompaniesRepository companiesRepository
 ) : IAction<ApplyRoundActionParams, Result>
 {
@@ -58,79 +59,80 @@ public class ApplyRoundAction(
             return Result.Fail($"Game with Id \"{gameId}\" not found.");
         }
 
+        
 
         Console.WriteLine("\n\n\n\n");
 
-        if (action is SendEmployeeForTrainingRoundAction sendemployee)
-        {
-            var employee = await employeesRepository.GetEmployeetById(sendemployee.Payload.EmployeeId);
+        // if (action.ActionType == "RecruitAConsultant")
+        // {
+        //     var employee = await employeesRepository.GetEmployeetById(sendemployee.Payload.EmployeeId);
 
-            //on vérifie si l'employée n'est pas déjà en formation
-            if (employee.enformation == false)
-            {
-                Console.WriteLine("\n\n\n\n"+employee.dureeformation+"\n\n\n\n");
-                //on met à true la variable en formation afin de savoir qu'il l'est
-                employee.enformation = true;
+        //     //on vérifie si l'employée n'est pas déjà en formation
+        //     if (employee.enformation == false)
+        //     {
+        //         Console.WriteLine("\n\n\n\n"+employee.dureeformation+"\n\n\n\n");
+        //         //on met à true la variable en formation afin de savoir qu'il l'est
+        //         employee.enformation = true;
 
-                //on met son nombre de tour à 1 pour qu'au prochain tour cela tombe à 0 avec la fonction dans finishround et que sa formation se terminer automatiquement grâce à la fonction après applyroundaction dans finishround
-                employee.dureeformation = sendemployee.Payload.numberofleveltoimproveskill;
+        //         //on met son nombre de tour à 1 pour qu'au prochain tour cela tombe à 0 avec la fonction dans finishround et que sa formation se terminer automatiquement grâce à la fonction après applyroundaction dans finishround
+        //         employee.dureeformation = sendemployee.Payload.numberofleveltoimproveskill;
 
-                Console.WriteLine("\n\n\n\nNom : "+employee.Name+" true : "+employee.enformation+" la durée de sa formation devrais être à 1 : "+employee.dureeformation+"\n\n\n\n");
-                //on rajoute ensuite son nouveau niveau de skill en vérifiant quel skill à été choisis
-                foreach (var skill in employee.Skills)
-                {
-                    if (skill.Name == sendemployee.Payload.nameofskillupgrade)
-                    {
-                        skill.Level += sendemployee.Payload.numberofleveltoimproveskill;
-                    }
-                    else
-                    {
-                        Console.WriteLine("\n\nle skill " + skill.Name + " n'est pas égale au skill " + sendemployee.Payload.nameofskillupgrade + ".\n\n");
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("l'employée est en formation, il ne peut pas faire une seconde formation avant d'avoir terminer celle-là");
-            }
-            //l'employee sera en formation pendant un tour donc on ne pourras pas l'envoyer faire un projet ni faire une autre formation
-            //ni le virer lors du prochain tour, lors du début du prochain tour on remettra plus haut dans le code tout les bool enformation à false
+        //         Console.WriteLine("\n\n\n\nNom : "+employee.Name+" true : "+employee.enformation+" la durée de sa formation devrais être à 1 : "+employee.dureeformation+"\n\n\n\n");
+        //         //on rajoute ensuite son nouveau niveau de skill en vérifiant quel skill à été choisis
+        //         foreach (var skill in employee.Skills)
+        //         {
+        //             if (skill.Name == sendemployee.Payload.nameofskillupgrade)
+        //             {
+        //                 skill.Level += sendemployee.Payload.numberofleveltoimproveskill;
+        //             }
+        //             else
+        //             {
+        //                 Console.WriteLine("\n\nle skill " + skill.Name + " n'est pas égale au skill " + sendemployee.Payload.nameofskillupgrade + ".\n\n");
+        //             }
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine("l'employée est en formation, il ne peut pas faire une seconde formation avant d'avoir terminer celle-là");
+        //     }
+        //     //l'employee sera en formation pendant un tour donc on ne pourras pas l'envoyer faire un projet ni faire une autre formation
+        //     //ni le virer lors du prochain tour, lors du début du prochain tour on remettra plus haut dans le code tout les bool enformation à false
 
-            Console.WriteLine("TRAINING");
-        }
-        else if (action is ParticipateInCallForTendersRoundAction)
-            Console.WriteLine("TENDERS");
+        //     Console.WriteLine("TRAINING");
+        // }
+        // else if (action.ActionType == "ParticipateInCallForTenders")
+        //     Console.WriteLine("TENDERS");
 
-        else if (action is RecruitAConsultantRoundAction recruit)
-        {
-            Console.WriteLine("RECRUIT");
+        // else if (action.ActionType == "RecruitAConsultant")
+        // {
+        //     Console.WriteLine("RECRUIT");
 
-            int nonNullableInt = action.PlayerId!.Value -2; // Le moins 2 car y'a un bug dans la bdd
-            var consultant = await consultantsRepository.GetConsultantById(recruit.Payload.ConsultantId);
-            await consultantsRepository.DeleteConsultantById(consultant.Id);
-            await employeesRepository.SaveEmployeeFromConsultant(consultant!, nonNullableInt);
-        }
+        //     int nonNullableInt = action.PlayerId!.Value -2; // Le moins 2 car y'a un bug dans la bdd
+        //     var consultant = await consultantsRepository.GetConsultantById(recruit.Payload.ConsultantId);
+        //     await consultantsRepository.DeleteConsultantById(consultant.Id);
+        //     await employeesRepository.SaveEmployeeFromConsultant(consultant!, nonNullableInt);
+        // }
 
-        else if (action is FireAnEmployeeRoundAction Fire)
-        {
-            Console.WriteLine("FIRE EMPLOYEE");
-            var employee = await employeesRepository.GetEmployeetById(Fire.Payload.EmployeeId);
+        // else if (action.ActionType == "FireAnEmployee")
+        // {
+        //     Console.WriteLine("FIRE EMPLOYEE");
+        //     var employee = await employeesRepository.GetEmployeetById(Fire.Payload.EmployeeId);
 
-            if(employee.enformation==false)
-            {
-                await employeesRepository.DeleteEmployeeById(employee.Id);
-            }
-            else
-            {
-                Console.WriteLine("l'employée est en formation, il ne peut pas être virée");
-            }
-        }
-        else if (action is PassMyTurnRoundAction)
-            Console.WriteLine("PASS TURN");
-        else
-        {
-            Console.WriteLine("AUTRE"); Console.WriteLine(action.ToString());
-        }
+        //     if(employee.enformation==false)
+        //     {
+        //         await employeesRepository.DeleteEmployeeById(employee.Id);
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine("l'employée est en formation, il ne peut pas être virée");
+        //     }
+        // }
+        // else if (action.ActionType == "PassMyTurn")
+        //     Console.WriteLine("PASS TURN");
+        // else
+        // {
+        //     Console.WriteLine("AUTRE"); Console.WriteLine(action.ToString());
+        // }
 
         await gameHubService.UpdateCurrentGame(gameId: gameId);
 
