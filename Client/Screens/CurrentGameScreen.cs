@@ -172,29 +172,91 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         // Suppression de tous les écrans
         Target.RemoveAll();
 
+        var customColorScheme = new ColorScheme()
+        {
+            Normal = new Terminal.Gui.Attribute(Color.Green, Color.Black), // Texte vert sur fond noir
+            Focus = new Terminal.Gui.Attribute(Color.Black, Color.Green),  // Texte noir sur fond vert (quand focus)
+            HotNormal = new Terminal.Gui.Attribute(Color.Green, Color.Black),
+            HotFocus = new Terminal.Gui.Attribute(Color.Black, Color.Green)
+        };
+
         // Instanciation des éléments visuel
         var loadingDialog = new Dialog()
         {
-            Width = 20,
-            Height = 3
+            Width = Dim.Fill(),  // Remplir la largeur disponible
+            Height = Dim.Fill(), // Remplir la hauteur disponible
+            X = Pos.Center(),
+            Y = Pos.Center(),
+            ColorScheme = new ColorScheme()
+            {
+                Normal = new Terminal.Gui.Attribute(Color.Green, Color.Black), // Texte vert sur fond noir
+                Focus = new Terminal.Gui.Attribute(Color.Black, Color.Green),  // Texte noir sur fond vert (quand focus)
+                HotNormal = new Terminal.Gui.Attribute(Color.Green, Color.Black),
+                HotFocus = new Terminal.Gui.Attribute(Color.Black, Color.Green)
+            }
         };
 
         var loadingText = new Label()
         {
-            Text = "Game Ended !",
+            Text = "Game Ended !\nHere are the results !",
             X = Pos.Center(),
-            Y = Pos.Center()
+            Y = Pos.Top(loadingDialog) + 1,
+            ColorScheme = customColorScheme
+        };
+
+        var resultatText = new Label()
+        {
+            Text = "Game Ended !\n",
+            X = Pos.Left(loadingDialog) + 1,
+            Y = Pos.Bottom(loadingText) + 1,
+            ColorScheme = customColorScheme
+        };
+
+        var winnerText = new Label()
+        {
+            Text = "The winner is :\n",
+            X = Pos.Left(loadingDialog) + 1,
+            Y = Pos.Bottom(resultatText) + 1,
+            ColorScheme = customColorScheme
+        };
+
+        foreach (var unplayer in CurrentGame!.Players)
+        {
+            resultatText.Text += $"Player : {unplayer.Name} Company : {unplayer.Company.Name} Treasury : {unplayer.Company.Treasury}\n";
+        }
+
+        var treasurywinner = 0;
+        foreach (var unplayer in CurrentGame!.Players)
+        {
+            if(treasurywinner<unplayer.Company.Treasury)
+            {
+                treasurywinner = unplayer.Company.Treasury;
+                winnerText.Text= $"The winner is : {unplayer.Name}";
+            }
+        }
+
+        var OkButton = new Button()
+        {
+            Text = "Retourner au menu de jeu.",
+            IsDefault = false,
+            X = Pos.Center(),
+            Y = Pos.Bottom(winnerText) + 2,
+            ColorScheme = customColorScheme
         };
 
         // Affichage des éléments visuel
         loadingDialog.Add(loadingText);
+        loadingDialog.Add(resultatText);
+        loadingDialog.Add(winnerText);
+        loadingDialog.Add(OkButton);
         Target.Add(loadingDialog);
 
-        await Task.Delay(3000);
-
-        // Affichage du menu d'accueil
-        var mainMenuScreen = new MainMenuScreen(Target);
-        await mainMenuScreen.Show();
+        OkButton.Accept += async (sender, e) =>
+        {
+            // Affichage du menu d'accueil lorsque le bouton est accepté
+            var mainMenuScreen = new MainMenuScreen(Target);
+            await mainMenuScreen.Show();
+        };
     }
 
     private async Task ActInRound()
