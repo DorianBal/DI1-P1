@@ -28,7 +28,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
     private bool CurrentGameLoading = true;
     private bool CurrentGameStarted = false;
     private bool CurrentGameEnded = false;
-    
+
     private CurrentGameActionList.Action? CurrentRoundAction = null;
 
     public async Task Show()
@@ -183,7 +183,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         // Instanciation des éléments visuel
         var loadingDialog = new Dialog()
         {
-            Width = Dim.Fill(),  // Remplir la largeur disponible
+            Width = Dim.Fill(),  // Remplir la largeur disponiblecd..
             Height = Dim.Fill(), // Remplir la hauteur disponible
             X = Pos.Center(),
             Y = Pos.Center(),
@@ -228,10 +228,10 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         var treasurywinner = 0;
         foreach (var unplayer in CurrentGame!.Players)
         {
-            if(treasurywinner<unplayer.Company.Treasury)
+            if (treasurywinner < unplayer.Company.Treasury)
             {
                 treasurywinner = unplayer.Company.Treasury;
-                winnerText.Text= $"The winner is : {unplayer.Name}";
+                winnerText.Text = $"The winner is : {unplayer.Name}";
             }
         }
 
@@ -316,8 +316,8 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
 
             // Calculer la largeur nécessaire pour centrer le texte
 
-            var centeredTitle = new string(' ',0) + title;
-            var centeredMessage = new string(' ',0) + message;
+            var centeredTitle = new string(' ', 0) + title;
+            var centeredMessage = new string(' ', 0) + message;
 
             var numskill = MessageBox.Query(90, 5, centeredTitle, centeredMessage, skills);
 
@@ -377,11 +377,11 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
                 }
             }
 
-            
+
 
             var employeeListString = employeesAvailable.ToArray();
 
-            var employeeselectionnedfortheproject = MessageBox.Query(90 + ((employees.Count - 2 ) * 10), 10, "Call For tenders", "Which employee do you want to send to do this project", employeeListString);
+            var employeeselectionnedfortheproject = MessageBox.Query(90 + ((employees.Count - 2) * 10), 10, "Call For tenders", "Which employee do you want to send to do this project", employeeListString);
             //je ne sais pas encore comment on va récupérer l'employeeid car on ne peut pas faire de recherche par nom car des employées peuvent avoir un même nom=>donc potentiellement rajoutée plus haut dans employeesAvailable une liste employee ID et si le résultat de la messagebox est le numéro de la réponse (réponse 0,1,2etc) on va faire listemployeeid[num de la réponse] afin de récupérer l'id correspondant à l'employée cliquer
 
             ValuePayload = $"{{\"CallForTendersId\":{CurrentView.SelectedItemId}, \"employeeid\":\"{employeeselectionnedfortheproject}\"}}";
