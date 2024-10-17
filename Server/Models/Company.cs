@@ -33,5 +33,8 @@ public class Company(string name, int playerId)
             totsalary = totsalary + unemployee.Salary;
         }
         Treasury -= totsalary;
+
+        if (Treasury <= 0)
+            Treasury = 0;
     }
 }

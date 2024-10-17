@@ -28,7 +28,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
     private bool CurrentGameLoading = true;
     private bool CurrentGameStarted = false;
     private bool CurrentGameEnded = false;
-
+    
     private CurrentGameActionList.Action? CurrentRoundAction = null;
 
     public async Task Show()
@@ -246,9 +246,19 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
 
         if (CurrentRoundAction == CurrentGameActionList.Action.SendEmployeeForTraining && CurrentView != null)
         {
-            //on demande avec un messagebox le skill pour lequel on veut envoyer l'employer faire son entrainement
-            var skills = new string[] { "Communication", "Programmation", "Reseau", "Cybersecurite", "Management" }; // 0,1,2,3,4
-            var numskill = MessageBox.Query(150, 5, "Training", "Which skill would you like to level up ?", skills);
+            var skills = new string[] { "Communication", "Programmation", "Reseau", "Cybersecurite", "Management" };
+
+            // Titre et message centrés
+            var title = "Training";
+            var message = "Which skill would you like to level up ?";
+
+            // Calculer la largeur nécessaire pour centrer le texte
+
+            var centeredTitle = new string(' ',0) + title;
+            var centeredMessage = new string(' ',0) + message;
+
+            var numskill = MessageBox.Query(90, 5, centeredTitle, centeredMessage, skills);
+
             var nomskill = numskill switch
             {
                 0 => "Communication",
@@ -258,12 +268,19 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
                 4 => "Management",
                 _ => "Unknown"
             };
-            var levelplus = new string[] { "1 level = 1 turn", "2 level = 2 turn", "3 level = 3 turn" }; // 0,1,2
-            var levelplusskill = MessageBox.Query(150, 5, "Level", "How much level do you want to level up this skill ?", levelplus);
+
+            var levelplus = new string[] { "1 level = 1 turn", "2 levels = 2 turns", "3 levels = 3 turns" };
+
+            // Titre et message pour le niveau centrés
+            var levelTitle = "Level";
+            var levelMessage = "How much level do you want to level up this skill ?";
+
+            var centeredLevelTitle = new string(' ', 0) + levelTitle;
+            var centeredLevelMessage = new string(' ', 0) + levelMessage;
+
+            var levelplusskill = MessageBox.Query(90, 5, centeredLevelTitle, centeredLevelMessage, levelplus);
             levelplusskill = 1;
 
-            //ici on va ouvrir une fenêtre demandant le type de la formation et attendre la réponse puis elle sera rajouter dans valuepayload à la place du 1
-            //ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + ", \"nameofskillupgrade\":" + nomskill + "}"; ancienne version où ne passer pas nomskill car il n'y avais pas de " autour du string
             ValuePayload = $"{{\"EmployeeId\":{CurrentView.SelectedItemId}, \"nameofskillupgrade\":\"{nomskill}\", \"numberofleveltoimproveskill\":{levelplusskill}}}";
             Console.WriteLine("\n\n\n\n" + ValuePayload + "\n\n\n\n");
         }
@@ -298,9 +315,11 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
                 }
             }
 
+            
+
             var employeeListString = employeesAvailable.ToArray();
 
-            var employeeselectionnedfortheproject = MessageBox.Query(180, 10, "Call For tenders", "Which employee do you want to send to do this project", employeeListString);
+            var employeeselectionnedfortheproject = MessageBox.Query(90 + ((employees.Count - 2 ) * 10), 10, "Call For tenders", "Which employee do you want to send to do this project", employeeListString);
             //je ne sais pas encore comment on va récupérer l'employeeid car on ne peut pas faire de recherche par nom car des employées peuvent avoir un même nom=>donc potentiellement rajoutée plus haut dans employeesAvailable une liste employee ID et si le résultat de la messagebox est le numéro de la réponse (réponse 0,1,2etc) on va faire listemployeeid[num de la réponse] afin de récupérer l'id correspondant à l'employée cliquer
 
             ValuePayload = $"{{\"CallForTendersId\":{CurrentView.SelectedItemId}, \"employeeid\":\"{employeeselectionnedfortheproject}\"}}";
@@ -921,9 +940,9 @@ public class CurrentGameCompanyView : CurrentGameView
 
 
 
-             CallForTenders.Add(callfortendersTree);
+        //          CallForTenders.Add(callfortendersTree);
 
-             LeftBody!.Add(CallForTenders);
+        LeftBody!.Add(CallForTenders);
     }
 
     private void SetupActions()
@@ -945,15 +964,58 @@ public class CurrentGameCompanyView : CurrentGameView
             Height = Dim.Fill()
         };
 
-        actionList.OpenSelectedItem += (_, selected) => { OnRoundAction(null, (CurrentGameActionList.Action) selected.Value); };
+        actionList.CanFocus = true;
+        actionList.OpenSelectedItem += (_, selected) =>
+        {
+            var selectedAction = (CurrentGameActionList.Action) selected.Value;
+
+            if (selectedAction == CurrentGameActionList.Action.FireAnEmployee)
+            {
+                var selectedEmployee = CurrentPlayer.Company.Employees.FirstOrDefault(e => e.Id == SelectedItemId);
+
+                if (selectedEmployee == null)
+                {
+                    MessageBox.ErrorQuery("Action Unavailable", "You must select an employee to fire.", "OK");
+                    return;
+                }
+            }
+
+            if (selectedAction == CurrentGameActionList.Action.RecruitAConsultant)
+            {
+                var selectedConsultant = Game.Consultants.FirstOrDefault(c => c.Id == SelectedItemId);
+
+                if (selectedConsultant == null)
+                {
+                    MessageBox.ErrorQuery("Action Unavailable", "You must select a consultant to recruit.", "OK");
+                    return;
+                }
+            }
+
+            // Désactiver "SendEmployeeForTraining" si un employé n'est pas sélectionné
+            if (selectedAction == CurrentGameActionList.Action.SendEmployeeForTraining)
+            {
+                var selectedEmployee = CurrentPlayer.Company.Employees.FirstOrDefault(e => e.Id == SelectedItemId);
+
+                if (selectedEmployee == null)
+                {
+                    MessageBox.ErrorQuery("Action Unavailable", "You must select an employee to send for training.", "OK");
+                    return;
+                }
+            }
+
+            OnRoundAction(null, selectedAction);
+        };
 
         Actions.Add(actionList);
-
         actionList.SetFocus();
         actionList.MoveHome();
 
         RightBody!.Add(Actions);
     }
+
+
+
+
 
     private void RemoveHeader()
     {

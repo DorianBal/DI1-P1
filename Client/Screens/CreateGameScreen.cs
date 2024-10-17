@@ -251,7 +251,8 @@ public class CreateGameForm
         {
             Text = "Submit",
             IsDefault = true,
-            Enabled = false
+            Enabled = false,
+            Visible = false
         };
 
         ReturnButton = new Button()
@@ -274,6 +275,26 @@ public class CreateGameForm
 
         var submitButtonWidth = SubmitButton.Width;
         var returnButtonWidth = ReturnButton.Width;
+
+        // Filtre pour les chiffres uniquement
+        RoundsField.TextChanged += (sender, e) =>
+        {
+            // Gardez uniquement les chiffres dans le champ
+            var text = RoundsField.Text.ToString();
+            var filteredText = new string(text.Where(char.IsDigit).ToArray());
+
+            // Limitez la longueur à 2 caractères
+            if (filteredText.Length > 2)
+            {
+                filteredText = filteredText.Substring(0, 2);
+            }
+
+            if (text != filteredText)
+            {
+                RoundsField.Text = filteredText; // Met à jour le texte avec les chiffres uniquement et limite la longueur
+            }
+            UpdateSubmitButtonState(); // Met à jour l'état du bouton Soumettre
+        };
 
         ButtonsView.Width = submitButtonWidth + returnButtonWidth + 1;
 
@@ -299,5 +320,10 @@ public class CreateGameForm
                                !string.IsNullOrWhiteSpace(PlayerNameField.Text.ToString()) &&
                                !string.IsNullOrWhiteSpace(CompanyNameField.Text.ToString()) &&
                                isRoundsValid;
+
+        SubmitButton.Visible = !string.IsNullOrWhiteSpace(GameNameField.Text.ToString()) &&
+                              !string.IsNullOrWhiteSpace(PlayerNameField.Text.ToString()) &&
+                              !string.IsNullOrWhiteSpace(CompanyNameField.Text.ToString()) &&
+                              isRoundsValid;
     }
 }

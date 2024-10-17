@@ -382,7 +382,8 @@ public class JoinGameForm
         {
             Text = "Submit",
             IsDefault = true,
-            Enabled = false // (désactivé dès le départ)
+            Enabled = false, // (désactivé dès le départ)
+            Visible = false
         };
 
         ReturnButton = new Button() // Bouton retour (pour revenir au menu d'accueil)
@@ -423,6 +424,10 @@ public class JoinGameForm
     {
         // Désactive le bouton Submit si les champs ne sont pas remplis
         SubmitButton.Enabled = !string.IsNullOrWhiteSpace(PlayerNameField.Text.ToString()) &&
+                               !string.IsNullOrWhiteSpace(CompanyNameField.Text.ToString());
+
+        // Désactive le bouton Submit si les champs ne sont pas remplis
+        SubmitButton.Visible = !string.IsNullOrWhiteSpace(PlayerNameField.Text.ToString()) &&
                                !string.IsNullOrWhiteSpace(CompanyNameField.Text.ToString());
     }
 
