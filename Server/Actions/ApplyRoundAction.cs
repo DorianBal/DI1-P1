@@ -108,7 +108,8 @@ public class ApplyRoundAction(
             //l'employee sera en formation pendant un tour donc on ne pourras pas l'envoyer faire un projet ni faire une autre formation
             //ni le virer lors du prochain tour, lors du début du prochain tour on remettra plus haut dans le code tout les bool enformation à false
         }
-        if (action.ActionType == "ParticipateInCallForTenders")
+
+        else if(action.ActionType == "ParticipateInCallForTenders")
             Console.WriteLine("TENDERS");
 
         else if (action.ActionType == "RecruitAConsultant")

@@ -232,6 +232,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
         string ValuePayload = "{}";
         if (CurrentRoundAction == CurrentGameActionList.Action.RecruitAConsultant && CurrentView != null)
         {
+            await Task.Delay(1000);
             ValuePayload = "{\"ConsultantId\":" + CurrentView.SelectedItemId + "}";
         }
 
@@ -239,6 +240,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
 
         if (CurrentRoundAction == CurrentGameActionList.Action.FireAnEmployee && CurrentView != null)
         {
+            await Task.Delay(1000);
             ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + "}";
         }
 
@@ -258,7 +260,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             };
             var levelplus = new string[] { "1 level = 1 turn", "2 level = 2 turn", "3 level = 3 turn" }; // 0,1,2
             var levelplusskill = MessageBox.Query(150, 5, "Level", "How much level do you want to level up this skill ?", levelplus);
-            levelplusskill += 1;
+            levelplusskill = 1;
 
             //ici on va ouvrir une fenêtre demandant le type de la formation et attendre la réponse puis elle sera rajouter dans valuepayload à la place du 1
             //ValuePayload = "{\"EmployeeId\":" + CurrentView.SelectedItemId + ", \"nameofskillupgrade\":" + nomskill + "}"; ancienne version où ne passer pas nomskill car il n'y avais pas de " autour du string
@@ -305,7 +307,7 @@ public class CurrentGameScreen(Window target, int gameId, string playerName)
             Console.WriteLine("\n\n\n\nYO : " + ValuePayload + "\n\n\n\n");
         }
 
-
+        await Task.Delay(100);
         var request = httpClient.PostAsJsonAsync($"/rounds/{CurrentGame!.Rounds.MaxBy(r => r.Id)!.Id}/act", new
         {
             ActionType = CurrentRoundAction!.ToString(),
@@ -919,7 +921,7 @@ public class CurrentGameCompanyView : CurrentGameView
 
 
 
-    //     Consultants.Add(callfortendersTree);
+    //     CallForTenders.Add(callfortendersTree);
 
     //     LeftBody!.Add(CallForTenders);
     // }
