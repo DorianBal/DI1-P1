@@ -58,7 +58,7 @@ public class ApplyRoundAction(
 
 
 
-        Console.WriteLine("\n\n\n\n");
+        Console.WriteLine("\n\n\n\n codeErreur : " + action.ActionType);
 
         if (action.ActionType == "SendEmployeeForTraining")
         {

@@ -11,6 +11,7 @@ public sealed record GameOverview(
     string Status,
     ICollection<RoundOverview> Rounds,
     ICollection<ConsultantOverview> Consultants
+    // ICollection<ConsultantOverview> Projects
 );
 
 public sealed record PlayerOverview(
@@ -43,7 +44,7 @@ public sealed record EmployeeOverview(
     bool enprojet
 );
 
-public sealed record ProjectOverview(
+public record ProjectOverview(
     int Id,
     string Name,
     int Revenu,
