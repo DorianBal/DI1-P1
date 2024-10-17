@@ -19,8 +19,11 @@ public class Consultant(string name, int salaryRequirement, int gameId)
     public ConsultantOverview ToOverview()
     {
         return new ConsultantOverview(
-            Id is null ? 0 : (int) Id, Name,
-            SalaryRequirement, Skills.Select(s => s.ToOverview()).ToList()
+            Id is null ? 0 : 
+            (int) Id, 
+            Name,
+            SalaryRequirement, 
+            Skills.Select(s => s.ToOverview()).ToList()
         );
     }
 }
