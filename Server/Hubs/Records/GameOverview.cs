@@ -10,8 +10,8 @@ public sealed record GameOverview(
     int CurrentRound,
     string Status,
     ICollection<RoundOverview> Rounds,
-    ICollection<ConsultantOverview> Consultants
-    // ICollection<ConsultantOverview> Projects
+    ICollection<ConsultantOverview> Consultants,
+    ICollection<ProjectOverview> Projects
 );
 
 public sealed record PlayerOverview(

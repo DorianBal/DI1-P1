@@ -50,8 +50,8 @@ public class Game(string name, int rounds = 15)
             Id is null ? 0 : (int) Id, Name, Players.Select(p => p.ToOverview()).ToList(),
             Players.Count, 6, Rounds, RoundsCollection.Count,
             Status.ToString(), RoundsCollection.Select(r => r.ToOverview()).ToList(),
-            Consultants.Select(c => c.ToOverview()).ToList()
-            // Projects.Select(c => c.ToOverview()).ToList()
+            Consultants.Select(c => c.ToOverview()).ToList(),
+            Projects.Select(c => c.ToOverview()).ToList()
         );
     }
 }

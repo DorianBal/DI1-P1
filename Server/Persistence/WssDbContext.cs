@@ -85,7 +85,7 @@ public class WssDbContext(DbContextOptions options, IConfiguration configuration
 
         modelBuilder.Entity<Project>(e =>
         {
-            e.ToTable("projets");
+            e.ToTable("projects");
             e.HasKey(e => e.Id);
             e.Property(e => e.Name).HasColumnType("varchar(255)");
             e.HasOne(e => e.Game)

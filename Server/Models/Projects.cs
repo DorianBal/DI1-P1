@@ -25,8 +25,12 @@ public class Project(string name, int gameId, int revenu, int projectDuration)
     public ProjectOverview ToOverview()
     {
         return new ProjectOverview(
-            Id is null ? 0 : (int) Id, Name, Revenu,
-            Skills.Select(s => s.ToOverview()).ToList(), ProjectDuration
+            Id is null ? 0 : 
+            (int) Id, 
+            Name, 
+            Revenu, 
+            Skills.Select(s => s.ToOverview()).ToList(),
+            ProjectDuration
         );
     }
 }
